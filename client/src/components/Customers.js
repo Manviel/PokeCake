@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { getCustomers } from '../store/actions/customer';
 
-import '../css/customers.css';
+import '../css/Style.css';
 
 class Customers extends Component {
   componentWillMount() {
@@ -11,14 +11,18 @@ class Customers extends Component {
 
   render() {
     return (
-      <div>
-        <h2>Customers</h2>
-        <ul>
+      <article className="container">
+        <section className="flex bot">
+          <h2 className="head">Your Cart</h2>
+          <button className="btn">Check Out</button>
+        </section>
+        <h3 className="title bot">Order Summary</h3>
+        <ul className="list">
           {this.props.customers.map(customer =>
             <li key={customer.id}>{customer.firstName} {customer.lastName}</li>
           )}
         </ul>
-      </div>
+      </article>
     );
   }
 }

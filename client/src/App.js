@@ -1,23 +1,18 @@
-import React, { Component } from 'react';
-import { Provider } from 'react-redux';
-import store from './store';
+import React, { Fragment } from 'react';
 
 import Customers from './components/Customers';
 import './css/App.css';
 
-class App extends Component {
-  render() {
-    return (
-      <Provider store={store}>
-        <div className="App">
-          <header className="App-header">
-            <h1 className="App-title">React/Redux Express Starter</h1>
-          </header>
-          <Customers />
-        </div>
-      </Provider>
-    )
-  }
+const App = () => {
+  return (
+    <Fragment>
+      <header className="container">
+        <h1 className="title">Saga Cart</h1>
+        <p className="sub">Please wait while we fetch your info</p>
+      </header>
+      <Customers />
+    </Fragment>
+  );
 }
 
 export default App;

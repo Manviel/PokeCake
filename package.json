@@ -1,7 +1,7 @@
 {
   "name": "reactexpress",
   "version": "1.0.0",
-  "description": "Starter kit for creating React/Redux and Express apps",
+  "description": "Starter kit for React/Redux and Express",
   "main": "server.js",
   "scripts": {
     "client-install": "cd client && npm install",
