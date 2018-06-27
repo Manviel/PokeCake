@@ -3,3 +3,4 @@
 package-lock.json
 
 # production
+./src/store/actions/secret.js
