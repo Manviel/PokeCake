@@ -1,4 +1,4 @@
-import { GET_CUSTOMERS } from '../actions/constants'
+import { GET_CUSTOMERS } from '../actions/const'
 
 const customerReducer = (state = [], { type, payload }) => {
   switch (type) {
