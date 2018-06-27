@@ -1,13 +1,4 @@
-.flex {
-  display: flex;
-  justify-content: space-between;
-}
-
-.head {
-  font-size: 5rem;
-  font-weight: 400;
-  letter-spacing: 0.5rem;
-}
+.content { padding: 2rem 0; }
 
 .btn {
   color: #fff;
@@ -15,15 +6,10 @@
   padding: 1rem 3rem;
   border: none;
   border-radius: 3px;
+  margin: 2rem 0;
 }
 
-.list {
-  list-style: none;
-  width: 30%;
-  margin: auto;
-}
-
-li {
+.item {
   font-size: 1.2rem;
   line-height: 2rem;
   border-bottom: 1px dotted #777;

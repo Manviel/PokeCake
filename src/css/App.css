@@ -12,7 +12,7 @@ body {
 }
 
 .container {
-  padding: 20px;
+  padding: 2rem;
   text-align: center;
 }
 
@@ -20,7 +20,3 @@ body {
   font-size: 3rem;
   font-weight: 700;
 }
-
-.sub { font-size: 1.6rem; }
-
-.bot { margin-bottom: 2rem; }
