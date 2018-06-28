@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import MemeItem from './components/Item';
+import MyMemes from './components/MyMemes';
+
 import './css/Style.css';
 import './css/App.css';
 
@@ -26,6 +28,7 @@ class App extends Component {
     return (
       <article className="container">
         <h1 className="title">Welcome to the Meme Generator</h1>
+        <MyMemes />
         <form className="form">
           <div className="group">
             <label htmlFor="text0" className="label mg">Top text</label>
@@ -65,8 +68,6 @@ class App extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return state;
-}
+const mapStateToProps = (state) => state;
 
 export default connect(mapStateToProps, null)(App);

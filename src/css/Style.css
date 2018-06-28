@@ -69,3 +69,10 @@
   border-bottom: 2px solid #2998ff;
   width: 100%;
 }
+
+.picture {
+  display: inline-block;
+  margin: 0.5rem;
+  width: 22rem;
+  border-radius: 3px;
+}
