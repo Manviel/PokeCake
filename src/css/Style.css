@@ -10,7 +10,31 @@
 }
 
 .item {
+  display: inline-block;
   font-size: 1.2rem;
-  line-height: 2rem;
-  border-bottom: 1px dotted #777;
+  width: 15rem;
+  height: 15rem;
+  position: relative;
+  padding: 1rem;
+}
+
+.abs {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.meme {
+  width: 15rem;
+  height: 15rem;
+  border-radius: 3px;
+  object-fit: cover;
+  filter: brightness(50%);
+}
+
+.text {
+  width: 13rem;
+  border-radius: 3px;
+  margin: 1rem;
+  color: #fff;
 }

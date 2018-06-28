@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
+import MemeItem from './Item';
 import '../css/Style.css';
 
 class Memes extends Component {
@@ -22,17 +23,19 @@ class Memes extends Component {
         {
           this.props.memes.slice(0, this.state.limit).map((item, index) => {
             return (
-              <h4 key={index} className="item">{item.name}</h4>
+              <MemeItem key={index} meme={item} />
             )
           })
         }
-        <button className="btn" onClick={this.handleClick}>Load more...</button>
+        <footer>
+          <button className="btn" onClick={this.handleClick}>Load more...</button>
+        </footer>
       </section>
     );
   }
 }
 
-function mapStateToProps(state) {
+const mapStateToProps = (state) => {
   return state;
 }
 
