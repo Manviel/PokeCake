@@ -1,28 +1,30 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import { newMeme } from '../actions';
+import { createMeme } from '../actions';
 
-const MemeItem = (props) => {
+class MemeItem extends Component {
 
-  const postMeme = () => {
+  postMeme = () => {
     const obj = {
-      id: props.meme.id,
-      text: props.text
+      template_id: this.props.meme.id,
+      text0: this.props.text0,
+      text1: this.props.text1
     }
-    props.newMeme(obj);
+    this.props.createMeme(obj);
   }
 
-  return (
-    <div className="item">
-      <img src={props.meme.url}
-        alt={props.meme.name}
-        className="abs meme"
-        onClick={postMeme}
-      />
-      <p className="abs text">{props.meme.name}</p>
-    </div>
-  );
+  render() {
+    return (
+      <div className="item" onClick={this.postMeme}>
+        <img src={this.props.meme.url}
+          alt={this.props.meme.name}
+          className="abs meme"
+        />
+        <p className="abs text">{this.props.meme.name}</p>
+      </div>
+    );
+  }
 }
 
-export default connect(null, { newMeme })(MemeItem);
+export default connect(null, { createMeme })(MemeItem);

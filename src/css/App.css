@@ -3,12 +3,13 @@ html { font-size: 62.5%; }
 body {
   font-family: "Lato", sans-serif;
   box-sizing: border-box;
-  padding: 3rem;
+  padding: 0 3rem;
 }
 
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 .container {
