@@ -1,12 +1,15 @@
 .content { padding: 2rem 0; }
 
+.mg { margin: 1rem 0; }
+
+.group { width: 30rem; }
+
 .btn {
   color: #fff;
   background-color: #2998ff;
   padding: 1rem 3rem;
   border: none;
   border-radius: 3px;
-  margin: 2rem 0;
 }
 
 .item {
@@ -32,9 +35,37 @@
   filter: brightness(50%);
 }
 
+.meme:hover {
+  transition: 1s;
+  filter: brightness(10%);
+}
+
 .text {
   width: 13rem;
   border-radius: 3px;
   margin: 1rem;
   color: #fff;
+}
+
+.form {
+  display: flex;
+  justify-content: center;
+}
+
+.label {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 700;
+  width: 100%;
+}
+
+.input {
+  display: block;
+  padding: 1.5rem 2rem;
+  border-radius: 3px;
+  background-color: rgba(#fff, 0.5);
+  border: none;
+  border-bottom: 2px solid #2998ff;
+  width: 100%;
+  box-sizing: border-box;
 }

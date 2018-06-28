@@ -28,7 +28,7 @@ class Memes extends Component {
           })
         }
         <footer>
-          <button className="btn" onClick={this.handleClick}>Load more...</button>
+          <button className="btn mg" onClick={this.handleClick}>Load more...</button>
         </footer>
       </section>
     );
