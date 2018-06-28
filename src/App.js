@@ -27,7 +27,7 @@ class App extends Component {
   render() {
     return (
       <article className="container">
-        <h1 className="title">Welcome to the Meme Generator</h1>
+        <h1 className="title mg">Welcome to the Meme Generator</h1>
         <MyMemes />
         <form className="form">
           <div className="group">
@@ -60,7 +60,7 @@ class App extends Component {
             })
           }
           <footer>
-            <button className="btn mg" onClick={this.handleClick}>Load more...</button>
+            <button className="btn rad mg" onClick={this.handleClick}>Load more...</button>
           </footer>
         </section>
       </article>

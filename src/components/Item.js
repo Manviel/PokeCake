@@ -16,12 +16,12 @@ class MemeItem extends Component {
 
   render() {
     return (
-      <div className="item" onClick={this.postMeme}>
+      <div className="item mg" onClick={this.postMeme}>
         <img src={this.props.meme.url}
           alt={this.props.meme.name}
-          className="abs meme"
+          className="abs meme rad"
         />
-        <p className="abs text">{this.props.meme.name}</p>
+        <p className="abs text mg">{this.props.meme.name}</p>
       </div>
     );
   }

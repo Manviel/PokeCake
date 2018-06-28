@@ -10,7 +10,7 @@ const MyMemes = (props) => {
             <img key={i}
               src={meme.data.url}
               alt="my"
-              className="picture"
+              className="picture mg rad"
             />
           )
         })
