@@ -17,3 +17,11 @@ Run application
 ```bash
 npm start
 ```
+
+## Server
+
+Change directory, install dependencies and run server
+
+```bash
+nodemon
+```
