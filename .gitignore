@@ -1,6 +1,7 @@
 # dependencies
 /node_modules
 package-lock.json
+/server/node_modules
 
 # production
 secret.js
