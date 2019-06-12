@@ -4,7 +4,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const passport = require('passport');
-const passportLocalMongoose = require('passport-local-mongoose');
+const session = require('express-session');
 
 const indexRouter = require('./routes/index');
 const postsRouter = require('./routes/posts');
@@ -23,6 +23,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(
+  session({
+    secret: 'secret',
+    resave: false,
+    saveUninitialized: true
+  })
+);
 
 passport.use(User.createStrategy());
 
