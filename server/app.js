@@ -1,14 +1,18 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const passport = require('passport');
+const passportLocalMongoose = require('passport-local-mongoose');
 
-var indexRouter = require('./routes/index');
-var postsRouter = require('./routes/posts');
-var reviewsRouter = require('./routes/reviews');
+const indexRouter = require('./routes/index');
+const postsRouter = require('./routes/posts');
+const reviewsRouter = require('./routes/reviews');
 
-var app = express();
+const User = require('./models/user');
+
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -19,6 +23,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+passport.use(User.createStrategy());
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 app.use('/', indexRouter);
 app.use('/posts', postsRouter);
