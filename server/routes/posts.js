@@ -7,7 +7,9 @@ const {
   getPosts,
   newPost,
   createPost,
-  showPost
+  showPost,
+  editPost,
+  postUpdate
 } = require("../controllers/posts");
 
 router.get("/", errorHandler(getPosts));
@@ -16,15 +18,11 @@ router.get("/new", newPost);
 
 router.get("/:id", errorHandler(showPost));
 
-router.get("/:id/edit", (req, res, next) => {
-  res.send("Edit");
-});
+router.get("/:id/edit", errorHandler(editPost));
 
 router.post("/", errorHandler(createPost));
 
-router.put("/:id", (req, res, next) => {
-  res.send("Update");
-});
+router.put("/:id", errorHandler(postUpdate));
 
 router.delete("/:id", (req, res, next) => {
   res.send("Delete");
