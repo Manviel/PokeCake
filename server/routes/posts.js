@@ -9,7 +9,8 @@ const {
   createPost,
   showPost,
   editPost,
-  postUpdate
+  postUpdate,
+  postDelete
 } = require("../controllers/posts");
 
 router.get("/", errorHandler(getPosts));
@@ -24,8 +25,6 @@ router.post("/", errorHandler(createPost));
 
 router.put("/:id", errorHandler(postUpdate));
 
-router.delete("/:id", (req, res, next) => {
-  res.send("Delete");
-});
+router.delete("/:id", errorHandler(postDelete));
 
 module.exports = router;

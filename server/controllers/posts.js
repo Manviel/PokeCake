@@ -33,6 +33,11 @@ module.exports = {
     res.redirect(`/posts/${post.id}`);
   },
 
+  async postDelete(req, res, next) {
+    await Post.findByIdAndRemove(req.params.id);
+    res.redirect("/posts");
+  },
+
   newPost(req, res, next) {
     res.render("posts/new");
   }
