@@ -7,6 +7,7 @@ const passport = require("passport");
 const session = require("express-session");
 const mongoose = require("mongoose");
 const methodOverride = require("method-override");
+const engine = require("ejs-mate");
 
 const indexRouter = require("./routes/index");
 const postsRouter = require("./routes/posts");
@@ -28,6 +29,7 @@ mongoose.connect(keys.mongoUri, {
 db.on("error", console.error.bind(console, "connection error: "));
 db.once("open", () => console.log("MongoDB connected"));
 
+app.engine("ejs", engine);
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
