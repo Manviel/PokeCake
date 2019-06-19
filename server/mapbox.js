@@ -1,22 +1,10 @@
-const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
+const mapboxgl = require("mapbox-gl/dist/mapbox-gl.js");
 
 const keys = require("./keys");
 
-const baseClient = mbxGeocoding({ accessToken: keys.mapboxToken });
+mapboxgl.accessToken = keys.mapboxToken;
 
-geoCoder = async location => {
-  try {
-    const response = await baseClient
-      .forwardGeocode({
-        query: location,
-        limit: 2
-      })
-      .send();
-
-    console.log(response.body);
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-geoCoder("Paris, France");
+var map = new mapboxgl.Map({
+  container: "Map",
+  style: "mapbox://styles/mapbox/streets-v11"
+});

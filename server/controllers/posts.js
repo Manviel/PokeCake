@@ -1,3 +1,9 @@
+const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
+
+const keys = require("../keys");
+
+const baseClient = mbxGeocoding({ accessToken: keys.mapboxToken });
+
 const Post = require("../models/post");
 
 module.exports = {
@@ -8,6 +14,17 @@ module.exports = {
   },
 
   async createPost(req, res, next) {
+    let response = await baseClient
+      .forwardGeocode({
+        query: req.body.post.location,
+        limit: 2
+      })
+      .send();
+
+    let match = response.body;
+
+    req.body.post.coordinates = match.features[0].geometry.coordinates;
+
     let post = await Post.create(req.body.post);
 
     res.redirect(`/posts/${post.id}`);
@@ -26,6 +43,17 @@ module.exports = {
   },
 
   async postUpdate(req, res, next) {
+    let response = await baseClient
+      .forwardGeocode({
+        query: req.body.post.location,
+        limit: 2
+      })
+      .send();
+
+    let match = response.body;
+
+    req.body.post.coordinates = match.features[0].geometry.coordinates;
+
     let post = await Post.findByIdAndUpdate(req.params.id, req.body.post, {
       new: true
     });

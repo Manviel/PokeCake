@@ -20,7 +20,10 @@ const app = express();
 
 const db = mongoose.connection;
 
-mongoose.connect(keys.mongoUri, { useNewUrlParser: true });
+mongoose.connect(keys.mongoUri, {
+  useNewUrlParser: true,
+  useFindAndModify: false
+});
 
 db.on("error", console.error.bind(console, "connection error: "));
 db.once("open", () => console.log("MongoDB connected"));
