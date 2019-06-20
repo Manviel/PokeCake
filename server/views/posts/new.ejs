@@ -1,6 +1,5 @@
+<% layout('layouts/index') -%>
 <h1>New post</h1>
-<% include ../layouts/navbar %>
-
 <form action="/posts" method="POST">
   <input type="text" name="post[title]" placeholder="Title" />
   <input type="text" name="post[price]" placeholder="Price" />
