@@ -12,6 +12,7 @@ const authenticated = next => (root, args, ctx, info) => {
   if (!ctx.currentUser) {
     throw new AuthenticationError("You must be logged in");
   }
+
   return next(root, args, ctx, info);
 };
 
@@ -22,6 +23,7 @@ module.exports = {
       const pins = await Pin.find({})
         .populate("author")
         .populate("comments.author");
+
       return pins;
     }
   },
@@ -60,16 +62,5 @@ module.exports = {
 
       return pinUpdated;
     })
-  },
-  Subscription: {
-    pinAdded: {
-      subscribe: () => pubsub.asyncIterator(PIN_ADDED)
-    },
-    pinDeleted: {
-      subscribe: () => pubsub.asyncIterator(PIN_DELETED)
-    },
-    pinUpdated: {
-      subscribe: () => pubsub.asyncIterator(PIN_UPDATED)
-    }
   }
 };

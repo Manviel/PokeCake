@@ -5,6 +5,8 @@ const mongoose = require("mongoose");
 const typeDefs = require("./typeDefs");
 const resolvers = require("./resolvers");
 
+const { findOrCreateUser } = require("./controllers/index");
+
 require("dotenv").config();
 
 mongoose
