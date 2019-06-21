@@ -1,21 +1,21 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
+import React from "react";
+import ReactDOM from "react-dom";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
 
-import { createStore, applyMiddleware } from 'redux';
-import { Provider } from 'react-redux';
+import Home from "./pages/Home";
+import Splash from "./pages/Splash";
 
-import rootReducer from './reducers';
-import thunk from 'redux-thunk';
+import "mapbox-gl/dist/mapbox-gl.css";
 
-import { fetchMemes } from './actions';
+const App = () => {
+  return (
+    <BrowserRouter>
+      <Switch>
+        <Route exact path="/" component={Home} />
+        <Route path="/login" component={Splash} />
+      </Switch>
+    </BrowserRouter>
+  );
+};
 
-const store = createStore(rootReducer, applyMiddleware(thunk));
-
-store.dispatch(fetchMemes());
-
-ReactDOM.render(
-  <Provider store={store}>
-    <App />
-  </Provider>, document.getElementById('root')
-);
+ReactDOM.render(<App />, document.getElementById("root"));
