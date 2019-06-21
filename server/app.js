@@ -2,12 +2,13 @@ const { ApolloServer } = require("apollo-server");
 
 const mongoose = require("mongoose");
 
-const keys = require("./keys");
 const typeDefs = require("./typeDefs");
 const resolvers = require("./resolvers");
 
+require("dotenv").config();
+
 mongoose
-  .connect(keys.mongoUri, {
+  .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useFindAndModify: false,
     useCreateIndex: true
