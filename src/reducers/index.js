@@ -16,6 +16,15 @@ const rootReducer = (state, action) => {
         currentUser: null,
         isAuth: false
       };
+    case "CREATE_DRAFT":
+      return {
+        ...state
+      };
+    case "UPDATE_DRAFT":
+      return {
+        ...state,
+        draft: action.payload
+      };
     default:
       return state;
   }
