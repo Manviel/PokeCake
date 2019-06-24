@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import Splash from "./pages/Splash";
 
 import Context from "./actions/context";
+import ProtectedRoute from "./actions/protectedRoute";
 import reducer from "./reducers/index";
 
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -19,7 +20,7 @@ const App = () => {
     <BrowserRouter>
       <Context.Provider value={{ state, dispatch }}>
         <Switch>
-          <Route exact path="/" component={Home} />
+          <ProtectedRoute exact path="/" component={Home} />
           <Route path="/login" component={Splash} />
         </Switch>
       </Context.Provider>
