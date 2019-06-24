@@ -2,7 +2,7 @@
 
 Create meme with React/Redux
 
-Node course: https://coursehunters.net/course/programmiruyte-s-node-uchites-delaya
+Node course: https://coursehunters.net/course/sozdaem-prilozhenie-s-react-hooks-i-graphql
 
 ## Introduction
 

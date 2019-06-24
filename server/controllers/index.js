@@ -24,12 +24,13 @@ const verifyAuthToken = async token => {
   }
 };
 
-const checkIfUserExists = async email => await User.findOne({ email }).exec();
+const checkIfUserExists = async email => await User.findOne({ email });
 
 const createNewUser = googleUser => {
-  const { name, email } = googleUser;
+  const user = new User({
+    password: googleUser.name,
+    email: googleUser.email
+  });
 
-  const user = { name, email };
-
-  return new User(user).save();
+  return user.save();
 };

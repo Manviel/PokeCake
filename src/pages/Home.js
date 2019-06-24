@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 
 import MemeItem from "../components/Item";
+import Header from "../components/Header";
 
 import "../css/Style.css";
 import "../css/App.css";
@@ -25,7 +26,7 @@ class Home extends Component {
   render() {
     return (
       <article className="container">
-        <h1 className="title mg">Welcome to the Meme Generator</h1>
+        <Header />
         <form className="form">
           <div className="group">
             <label htmlFor="text0" className="label mg">

@@ -8,6 +8,7 @@ import { CLIENT_ID } from "../config";
 import { ME_QUERY } from "../graphql/queries";
 
 import Context from "../actions/context";
+import Header from "../components/Header";
 
 const Splash = () => {
   const { state, dispatch } = useContext(Context);
@@ -36,6 +37,7 @@ const Splash = () => {
   ) : (
     <section className="container">
       <h1 className="title">Login</h1>
+      <Header />
       <GoogleLogin
         clientId={CLIENT_ID}
         onSuccess={onSuccess}
