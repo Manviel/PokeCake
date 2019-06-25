@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { GoogleLogin, GoogleLogout } from "react-google-login";
 import { GraphQLClient } from "graphql-request";
 
-import { CLIENT_ID } from "../config";
+import { CLIENT_ID, BASE_URL } from "../config";
 
 import { ME_QUERY } from "../graphql/queries";
 
@@ -16,7 +16,7 @@ const Header = props => {
     try {
       const idToken = googleUser.getAuthResponse().id_token;
 
-      const client = new GraphQLClient("http://localhost:4000/graphql", {
+      const client = new GraphQLClient(BASE_URL, {
         headers: { authorization: idToken }
       });
 

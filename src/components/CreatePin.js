@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
-import { GraphQLClient } from "graphql-request";
 
 import Context from "../actions/context";
+import { useClient } from "../actions/client";
 
 import { CREATE_PIN } from "../graphql/mutations";
 
@@ -9,18 +9,11 @@ const CreatePin = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
+  const client = useClient();
+
   const { state, dispatch } = useContext(Context);
 
   const handleSubmit = async () => {
-    const idToken = window.gapi.auth2
-      .getAuthInstance()
-      .currentUser.get()
-      .getAuthResponse().id_token;
-
-    const client = new GraphQLClient("http://localhost:4000/graphql", {
-      headers: { authorization: idToken }
-    });
-
     const { latitude, longitude } = state.draft;
 
     const variables = {
@@ -30,7 +23,9 @@ const CreatePin = () => {
       longitude
     };
 
-    await client.request(CREATE_PIN, variables);
+    const { createPin } = await client.request(CREATE_PIN, variables);
+
+    dispatch({ type: "CREATE_PIN", payload: createPin });
 
     handleDiscard();
   };
