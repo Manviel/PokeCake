@@ -10,14 +10,12 @@ const CreateComment = () => {
 
   const client = useClient();
 
-  const { state, dispatch } = useContext(Context);
+  const { state } = useContext(Context);
 
   const handleSubmit = async () => {
     const variables = { pinId: state.currentPin._id, text };
 
-    const { createComment } = await client.request(CREATE_COMMENT, variables);
-
-    dispatch({ type: "CREATE_COMMENT", payload: createComment });
+    await client.request(CREATE_COMMENT, variables);
 
     setText("");
   };

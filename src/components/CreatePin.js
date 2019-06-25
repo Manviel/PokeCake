@@ -23,9 +23,7 @@ const CreatePin = () => {
       longitude
     };
 
-    const { createPin } = await client.request(CREATE_PIN, variables);
-
-    dispatch({ type: "CREATE_PIN", payload: createPin });
+    await client.request(CREATE_PIN, variables);
 
     handleDiscard();
   };

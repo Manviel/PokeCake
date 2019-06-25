@@ -41,6 +41,14 @@ export const CREATE_COMMENT = `
         _id
         email
       }
+      comments {
+        text
+        createdAt
+        author {
+          _id
+          email
+        }
+      }
     }
   }
 `;

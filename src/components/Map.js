@@ -38,7 +38,8 @@ const Map = () => {
 
   useEffect(() => {
     getPins();
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const getPins = async () => {
     const { getPins } = await client.request(GET_PINS_QUERY);
@@ -75,9 +76,7 @@ const Map = () => {
   const handleDelete = async pin => {
     const variables = { pinId: pin._id };
 
-    const { deletePin } = await client.request(DELETE_PIN, variables);
-
-    dispatch({ type: "DELETE_PIN", payload: deletePin });
+    await client.request(DELETE_PIN, variables);
 
     setPopup(null);
   };
