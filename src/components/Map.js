@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
-import ReactMapGL, { Marker } from "react-map-gl";
+import ReactMapGL, { Marker, Popup } from "react-map-gl";
+import differenceInMinutes from "date-fns/difference_in_minutes";
 
 import Context from "../actions/context";
 import { useClient } from "../actions/client";
 
 import { GET_PINS_QUERY } from "../graphql/queries";
+import { DELETE_PIN } from "../graphql/mutations";
 
 import { MAPBOX_TOKEN } from "../config";
 
@@ -17,6 +19,7 @@ const view = {
 const Map = () => {
   const [viewport, setViewport] = useState(view);
   const [userPosition, setUserPosition] = useState(null);
+  const [popup, setPopup] = useState(null);
 
   const client = useClient();
 
@@ -57,6 +60,30 @@ const Map = () => {
     });
   };
 
+  const highlightNew = pin => {
+    const isNew = differenceInMinutes(Date.now(), Number(pin.createdAt)) <= 30;
+
+    return isNew ? "marker orange" : "marker purple";
+  };
+
+  const handleSelected = pin => {
+    setPopup(pin);
+
+    dispatch({ type: "SET_PIN", payload: pin });
+  };
+
+  const handleDelete = async pin => {
+    const variables = { pinId: pin._id };
+
+    const { deletePin } = await client.request(DELETE_PIN, variables);
+
+    dispatch({ type: "DELETE_PIN", payload: deletePin });
+
+    setPopup(null);
+  };
+
+  const isAuthUser = () => state.currentUser._id === popup.author._id;
+
   return (
     <ReactMapGL
       width="100"
@@ -95,9 +122,31 @@ const Map = () => {
           offsetLeft={-19}
           offsetTop={-37}
         >
-          <div className="marker purple" />
+          <div
+            onClick={() => handleSelected(pin)}
+            className={highlightNew(pin)}
+          />
         </Marker>
       ))}
+      {popup && (
+        <Popup
+          anchor="top"
+          latitude={popup.latitude}
+          longitude={popup.longitude}
+          closeOnClick={false}
+          onClose={() => setPopup(null)}
+        >
+          <p className="text mb">{popup.title}</p>
+          <p className="mb">
+            {popup.latitude.toFixed(4)}, {popup.longitude.toFixed(4)}
+          </p>
+          {isAuthUser() && (
+            <button className="input btn" onClick={() => handleDelete(popup)}>
+              Delete
+            </button>
+          )}
+        </Popup>
+      )}
     </ReactMapGL>
   );
 };

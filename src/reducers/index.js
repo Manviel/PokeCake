@@ -19,7 +19,8 @@ const rootReducer = (state, action) => {
     case "CREATE_DRAFT":
       return {
         ...state,
-        draft: null
+        draft: null,
+        currentPin: null
       };
     case "UPDATE_DRAFT":
       return {
@@ -38,6 +39,21 @@ const rootReducer = (state, action) => {
       return {
         ...state,
         pins: [...prevPins, newPin]
+      };
+    case "SET_PIN":
+      return {
+        ...state,
+        currentPin: action.payload,
+        draft: null
+      };
+    case "DELETE_PIN":
+      const deletePin = action.payload;
+      const filteredPins = state.pins.filter(pin => pin._id !== deletePin._id);
+
+      return {
+        ...state,
+        pins: filteredPins,
+        currentPin: null
       };
     default:
       return state;
