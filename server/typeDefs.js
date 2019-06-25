@@ -3,7 +3,6 @@ const { gql } = require("apollo-server");
 module.exports = gql`
   type User {
     _id: ID
-    name: String
     email: String
   }
 
@@ -12,7 +11,6 @@ module.exports = gql`
     createdAt: String
     title: String
     content: String
-    image: String
     latitude: Float
     longitude: Float
     author: User
@@ -27,7 +25,6 @@ module.exports = gql`
 
   input CreatePinInput {
     title: String
-    image: String
     content: String
     latitude: Float
     longitude: Float

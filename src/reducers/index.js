@@ -18,7 +18,8 @@ const rootReducer = (state, action) => {
       };
     case "CREATE_DRAFT":
       return {
-        ...state
+        ...state,
+        draft: null
       };
     case "UPDATE_DRAFT":
       return {

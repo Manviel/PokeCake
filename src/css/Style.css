@@ -7,6 +7,13 @@
 
 .content {
   padding-top: 2rem;
+  position: relative;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
 }
 
 .text {
@@ -14,11 +21,18 @@
   color: #1f3349;
 }
 
+.input {
+  padding: 1rem 2.6rem;
+  font-weight: 700;
+  font-size: 1.4rem;
+  border-radius: 50px;
+  border: 1px solid #dfe1e5;
+  outline: none;
+}
+
 .btn {
-  color: #fff;
-  background-color: #2998ff;
-  padding: 1rem 3rem;
-  border: none;
+  background: transparent;
+  border: 2px solid rgba(142, 68, 173, 1);
 }
 
 .marker {
@@ -26,6 +40,15 @@
   height: 2rem;
   border-radius: 50%;
   transform: scale(1);
+}
+
+.paper {
+  margin: 2rem;
+  padding: 2rem;
+  position: absolute;
+  right: 0;
+  top: 10%;
+  background: #fff;
 }
 
 .blue {
