@@ -31,7 +31,10 @@ const Header = props => {
 
   const onSignOut = () => dispatch({ type: "SIGNOUT_USER" });
 
-  const onFailure = err => console.error(err);
+  const onFailure = err => {
+    console.error(err);
+    dispatch({ type: "IS_LOGGED_IN", payload: false });
+  };
 
   return (
     <header className="header">

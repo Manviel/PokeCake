@@ -25,6 +25,7 @@ export const GET_PINS_QUERY = `
         createdAt
         author {
           _id
+          email
         }
       }
     }

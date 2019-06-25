@@ -27,3 +27,20 @@ export const DELETE_PIN = `
     }
   }
 `;
+
+export const CREATE_COMMENT = `
+  mutation($pinId: ID!, $text: String!) {
+    createComment(pinId: $pinId, text: $text) {
+      _id
+      createdAt
+      title
+      content
+      latitude
+      longitude
+      author {
+        _id
+        email
+      }
+    }
+  }
+`;

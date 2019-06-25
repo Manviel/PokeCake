@@ -55,6 +55,17 @@ const rootReducer = (state, action) => {
         pins: filteredPins,
         currentPin: null
       };
+    case "CREATE_COMMENT":
+      const updateCurrentPin = action.payload;
+      const updatedPins = state.pins.map(pin =>
+        pin._id === updateCurrentPin._id ? updateCurrentPin : pin
+      );
+
+      return {
+        ...state,
+        pins: updatedPins,
+        currentPin: updateCurrentPin
+      };
     default:
       return state;
   }

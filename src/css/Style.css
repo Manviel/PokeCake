@@ -35,6 +35,18 @@
   border: 2px solid rgba(142, 68, 173, 1);
 }
 
+.divider {
+  margin: 2rem 0;
+}
+
+.gray {
+  color: #969494;
+}
+
+.list {
+  list-style-type: none;
+}
+
 .marker {
   width: 2rem;
   height: 2rem;
