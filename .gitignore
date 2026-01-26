@@ -12,17 +12,13 @@ config.js
 
 # Build outputs
 /client/dist
-/client/lib
-/client/lib-types
-/client/server
 
 # Cache
 .cache
 .mf
 .rollup.cache
 tsconfig.tsbuildinfo
-.nx/cache
-.nx/workspace-data
+.nx
 
 # Logs
 logs
@@ -34,11 +30,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # Editor
-.vscode/*
-!.vscode/launch.json
-!.vscode/*.code-snippets
-!.vscode/extensions.json
-!.vscode/settings.json
+.vscode
 
 .idea
 .DS_Store
