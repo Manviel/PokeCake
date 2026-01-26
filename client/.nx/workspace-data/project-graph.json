@@ -1,0 +1,205 @@
+{
+  "nodes": {
+    "my-qwik-empty-starter": {
+      "name": "my-qwik-empty-starter",
+      "type": "app",
+      "data": {
+        "root": ".",
+        "name": "my-qwik-empty-starter",
+        "tags": [
+          "npm:private"
+        ],
+        "metadata": {
+          "targetGroups": {
+            "NPM Scripts": [
+              "build",
+              "build.client",
+              "build.preview",
+              "build.types",
+              "deploy",
+              "dev",
+              "dev.debug",
+              "fmt",
+              "fmt.check",
+              "lint",
+              "preview",
+              "start",
+              "qwik"
+            ]
+          },
+          "description": "Blank project with routing included",
+          "js": {
+            "packageName": "my-qwik-empty-starter",
+            "isInPackageManagerWorkspaces": true
+          }
+        },
+        "targets": {
+          "build": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "build"
+            },
+            "metadata": {
+              "scriptContent": "qwik build",
+              "runCommand": "npm run build"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "build.client": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "build.client"
+            },
+            "metadata": {
+              "scriptContent": "vite build",
+              "runCommand": "npm run build.client"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "build.preview": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "build.preview"
+            },
+            "metadata": {
+              "scriptContent": "vite build --ssr src/entry.preview.tsx",
+              "runCommand": "npm run build.preview"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "build.types": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "build.types"
+            },
+            "metadata": {
+              "scriptContent": "tsc --incremental --noEmit",
+              "runCommand": "npm run build.types"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "deploy": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "deploy"
+            },
+            "metadata": {
+              "scriptContent": "echo 'Run \"npm run qwik add\" to install a server adapter'",
+              "runCommand": "npm run deploy"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "dev": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "dev"
+            },
+            "metadata": {
+              "scriptContent": "vite --mode ssr",
+              "runCommand": "npm run dev"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "dev.debug": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "dev.debug"
+            },
+            "metadata": {
+              "scriptContent": "node --inspect-brk ./node_modules/vite/bin/vite.js --mode ssr --force",
+              "runCommand": "npm run dev.debug"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "fmt": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "fmt"
+            },
+            "metadata": {
+              "scriptContent": "prettier --write .",
+              "runCommand": "npm run fmt"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "fmt.check": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "fmt.check"
+            },
+            "metadata": {
+              "scriptContent": "prettier --check .",
+              "runCommand": "npm run fmt.check"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "lint": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "lint"
+            },
+            "metadata": {
+              "scriptContent": "eslint \"src/**/*.ts*\"",
+              "runCommand": "npm run lint"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "preview": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "preview"
+            },
+            "metadata": {
+              "scriptContent": "qwik build preview && vite preview --open",
+              "runCommand": "npm run preview"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "start": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "start"
+            },
+            "metadata": {
+              "scriptContent": "vite --open --mode ssr",
+              "runCommand": "npm run start"
+            },
+            "configurations": {},
+            "parallelism": true
+          },
+          "qwik": {
+            "executor": "nx:run-script",
+            "options": {
+              "script": "qwik"
+            },
+            "metadata": {
+              "scriptContent": "qwik",
+              "runCommand": "npm run qwik"
+            },
+            "configurations": {},
+            "parallelism": true
+          }
+        },
+        "implicitDependencies": []
+      }
+    }
+  },
+  "externalNodes": {},
+  "dependencies": {
+    "my-qwik-empty-starter": []
+  },
+  "version": "6.0",
+  "errors": [],
+  "computedAt": 1769433735176
+}

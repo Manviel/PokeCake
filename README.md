@@ -1,56 +1,61 @@
 # Apple Digital Twin Project
 
-A modern digital twin management system for Apple products and services, featuring a FastAPI backend and MongoDB persistence, fully orchestrated with Docker.
+A modern digital twin management system for Apple products and services, featuring a high-performance Qwik frontend and a robust FastAPI backend with MongoDB.
 
 ## Technology Stack
 
-- **Backend**: FastAPI (Python 3.11)
+### Frontend
+- **Framework**: [Qwik City](https://qwik.dev/)
+- **Styling**: Vanilla CSS (Apple Design System)
+- **Integration**: REST API via FastAPI
+
+### Backend
+- **Framework**: [FastAPI](https://fastapi.tiangolo.com/) (Python 3.11)
 - **Database**: MongoDB (NoSQL)
 - **Asynchronous Driver**: Motor
 - **Containerization**: Docker & Docker Compose
-- **Validation**: Pydantic
 
 ## Getting Started
 
 ### Prerequisites
-
-- [Docker](https://www.docker.com/products/docker-desktop/) and Docker Compose installed on your system.
+- [Docker](https://www.docker.com/products/docker-desktop/) and Docker Compose.
+- [Node.js](https://nodejs.org/) (for local frontend development).
 
 ### Running the Application
 
-1. **Clone the repository** (if you haven't already):
-   ```bash
-   git clone <repository-url>
-   cd PokeCake
-2. **Start the backend services**:
+1. **Start the Backend Services**:
    ```bash
    cd server
    docker-compose up -d
    ```
 
-3. **Verify the installation**:
-   The API will be available at `http://localhost:8000`.
+2. **Start the Frontend**:
+   ```bash
+   cd client
+   npm install
+   npm start
+   ```
 
-## API Documentation
-
-Once the server is running, you can access the interactive API documentation at:
-- **Swagger UI**: [http://localhost:8000/docs](http://localhost:8000/docs)
-- **ReDoc**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+3. **Explore**:
+   - **Frontend**: `http://localhost:5173`
+   - **API Documentation**: `http://localhost:8000/docs`
 
 ## Project Structure
 
 ```text
-server/
-├── models/           # Pydantic data models
-├── routes/           # API endpoint definitions
-├── .env              # Environment configuration
-├── database.py       # MongoDB connection logic
-├── Dockerfile        # Container build instructions
-├── docker-compose.yml # Service orchestration
-├── main.py           # FastAPI entry point
-└── requirements.txt  # Python dependencies
+PokeCake/
+├── client/           # Qwik Frontend
+│   ├── src/          # Application source
+│   └── ...
+├── server/           # FastAPI Backend
+│   ├── models/       # Pydantic data models
+│   ├── routes/       # API endpoint definitions
+│   └── ...
+└── docker-compose.yml # Backend orchestration
 ```
 
-## Future Work
-- **Frontend**: The frontend will be rewritten later to integrate with this new FastAPI backend.
-- **Service Integration**: Adding simulated diagnostics and service status for Apple products.
+## Features
+- **Premium Design**: Clean, Apple-inspired aesthetics with glassmorphism.
+- **Digital Twin Dashboard**: Real-time management of simulated Apple hardware.
+- **FastAPI Core**: Highly scalable and type-safe backend logic.
+- **Dockerized Backend**: Simplified deployment for the core services.
