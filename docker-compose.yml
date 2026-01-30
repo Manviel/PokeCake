@@ -4,8 +4,11 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - MONGODB_URL=mongodb://mongodb:27017
-      - DATABASE_NAME=apple_digital_twin
+      - MONGODB_HOST=mongodb
+      - MONGODB_USERNAME=${MONGODB_USERNAME}
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - MONGODB_DATABASE=${MONGODB_DATABASE}
+      - DATABASE_NAME=${MONGODB_DATABASE}
     depends_on:
       - mongodb
     networks:
@@ -23,7 +26,11 @@ services:
       - app-network
 
   mongodb:
-    image: mongo:latest
+    image: bitnami/mongodb:latest
+    environment:
+      - MONGODB_USERNAME=${MONGODB_USERNAME}
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - MONGODB_DATABASE=${MONGODB_DATABASE}
     ports:
       - "27017:27017"
     volumes:

@@ -1,6 +1,11 @@
 services:
   mongodb:
-    image: mongo:latest
+    image: bitnami/mongodb:latest
+    environment:
+      - MONGODB_USERNAME=${MONGODB_USERNAME}
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - MONGODB_DATABASE=${MONGODB_DATABASE}
+      - MONGODB_ROOT_PASSWORD=${MONGODB_PASSWORD}
     ports:
       - "27017:27017"
     volumes:
