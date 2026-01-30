@@ -1,9 +1,4 @@
-import {
-  component$,
-  $,
-  type Signal,
-  type PropFunction,
-} from "@builder.io/qwik";
+import { component$, type Signal, type PropFunction } from "@builder.io/qwik";
 import { Modal } from "../modal/modal";
 import { Button } from "../button/button";
 

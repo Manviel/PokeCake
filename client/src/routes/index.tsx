@@ -1,4 +1,4 @@
-import { component$, useSignal, useVisibleTask$, $ } from "@builder.io/qwik";
+import { component$, useSignal, useTask$, $ } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
 import { Button } from "../components/ui/button/button";
 import { fetchTwins, pairNewDevice, type ProductTwin } from "../services/api";
@@ -7,6 +7,7 @@ import { SpecsModal } from "../components/twin/SpecsModal";
 import { ManageModal } from "../components/twin/ManageModal";
 import { PlusIcon, Loader2Icon } from "lucide-qwik";
 import { Alert } from "../components/ui/alert/alert";
+import { useAlert } from "../hooks/useAlert";
 
 export default component$(() => {
   const twins = useSignal<ProductTwin[]>([]);
@@ -17,18 +18,12 @@ export default component$(() => {
   const showSpecs = useSignal(false);
   const showManage = useSignal(false);
 
-  // Alert State
-  const showAlert = useSignal(false);
-  const alertMessage = useSignal("");
-  const alertType = useSignal<"success" | "error" | "info">("info");
-
-  const notify = $(
-    (message: string, type: "success" | "error" | "info" = "info") => {
-      alertMessage.value = message;
-      alertType.value = type;
-      showAlert.value = true;
-    },
-  );
+  const {
+    show: showAlert,
+    message: alertMessage,
+    type: alertType,
+    notify,
+  } = useAlert();
 
   // Core Data Fetching
   const loadTwins = $(async () => {
@@ -43,7 +38,7 @@ export default component$(() => {
   });
 
   // Initial Load
-  useVisibleTask$(async () => {
+  useTask$(async () => {
     await loadTwins();
   });
 
@@ -78,8 +73,6 @@ export default component$(() => {
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     try {
-      await pairNewDevice();
-      await loadTwins();
       await pairNewDevice();
       await loadTwins();
       notify("New device paired successfully!", "success");

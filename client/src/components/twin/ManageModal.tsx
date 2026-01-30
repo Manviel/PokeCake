@@ -15,17 +15,10 @@ import {
 } from "../../services/api";
 import { Alert } from "../ui/alert/alert";
 import { ConfirmDialog } from "../ui/dialog/confirm-dialog";
+import { useAlert } from "../../hooks/useAlert";
+import { ManageAction } from "./ManageAction";
+import { getNextVersion } from "../../utils/version";
 import { XIcon, Loader2Icon } from "lucide-qwik";
-
-const getNextVersion = (current: string) => {
-  const match = current.match(/(\d+)\.(\d+)/);
-  if (match) {
-    const major = parseInt(match[1]);
-    const minor = parseInt(match[2]);
-    return `iOS ${major}.${minor + 1}`;
-  }
-  return "iOS 18.0";
-};
 
 interface ManageModalProps {
   show: Signal<boolean>;
@@ -39,18 +32,13 @@ export const ManageModal = component$<ManageModalProps>(
     const isRunningDiagnostics = useSignal(false);
     const isUnpairing = useSignal(false);
 
-    // Alert State
-    const showAlert = useSignal(false);
-    const alertMessage = useSignal("");
-    const alertType = useSignal<"success" | "error" | "info">("info");
+    const {
+      show: showAlert,
+      message: alertMessage,
+      type: alertType,
+      notify,
+    } = useAlert();
 
-    const notify = $(
-      (message: string, type: "success" | "error" | "info" = "info") => {
-        alertMessage.value = message;
-        alertType.value = type;
-        showAlert.value = true;
-      },
-    );
     const updateStatus = useSignal("Update OS");
     const showUnpairConfirm = useSignal(false);
 
@@ -147,14 +135,12 @@ export const ManageModal = component$<ManageModalProps>(
                 />
 
                 <div class="space-y-4">
-                  <div class="flex items-center justify-between rounded-2xl border border-white/40 bg-white/50 p-4">
-                    <div>
-                      <p class="font-semibold">Software Update</p>
-                      <p class="text-apple-text-secondary text-xs">
-                        Current: {twin.os_version}
-                      </p>
-                    </div>
+                  <ManageAction
+                    title="Software Update"
+                    description={`Current: ${twin.os_version}`}
+                  >
                     <Button
+                      q:slot="action"
                       look="primary"
                       size="sm"
                       onClick$={handleUpdateOS}
@@ -162,16 +148,14 @@ export const ManageModal = component$<ManageModalProps>(
                     >
                       {updateStatus.value}
                     </Button>
-                  </div>
+                  </ManageAction>
 
-                  <div class="flex items-center justify-between rounded-2xl border border-white/40 bg-white/50 p-4">
-                    <div>
-                      <p class="font-semibold">Simulate Diagnostics</p>
-                      <p class="text-apple-text-secondary text-xs">
-                        Run hardware health check
-                      </p>
-                    </div>
+                  <ManageAction
+                    title="Simulate Diagnostics"
+                    description="Run hardware health check"
+                  >
                     <Button
+                      q:slot="action"
                       look="secondary"
                       size="sm"
                       onClick$={handleDiagnostics}
@@ -186,16 +170,15 @@ export const ManageModal = component$<ManageModalProps>(
                         "Run"
                       )}
                     </Button>
-                  </div>
+                  </ManageAction>
 
-                  <div class="flex items-center justify-between rounded-2xl border border-red-100/40 bg-red-50/50 p-4">
-                    <div>
-                      <p class="font-semibold text-red-600">Unpair Device</p>
-                      <p class="text-xs text-red-400">
-                        Remove from digital twin network
-                      </p>
-                    </div>
+                  <ManageAction
+                    title="Unpair Device"
+                    description="Remove from digital twin network"
+                    isDanger
+                  >
                     <Button
+                      q:slot="action"
                       look="danger"
                       size="sm"
                       onClick$={handleUnpairClick}
@@ -203,7 +186,7 @@ export const ManageModal = component$<ManageModalProps>(
                     >
                       {isUnpairing.value ? "Unpairing..." : "Disconnect"}
                     </Button>
-                  </div>
+                  </ManageAction>
                 </div>
               </div>
             )}

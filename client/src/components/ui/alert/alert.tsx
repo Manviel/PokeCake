@@ -1,10 +1,4 @@
-import {
-  component$,
-  $,
-  type Signal,
-  useSignal,
-  useTask$,
-} from "@builder.io/qwik";
+import { component$, type Signal, useTask$ } from "@builder.io/qwik";
 import { CheckIcon, AlertCircleIcon, InfoIcon } from "lucide-qwik";
 
 export interface AlertProps {

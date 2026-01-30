@@ -1,4 +1,4 @@
-import { component$, $, type PropFunction } from "@builder.io/qwik";
+import { component$, type PropFunction } from "@builder.io/qwik";
 import { Button } from "../ui/button/button";
 import type { ProductTwin } from "../../services/api";
 
@@ -24,9 +24,8 @@ export const TwinCard = component$<TwinCardProps>(
           </div>
           <div class="h-1 overflow-hidden rounded-full bg-black/10">
             <div
-              class={`h-full w-[var(--battery-level)] transition-[width] duration-1000 ease-out ${
-                twin.battery_health > 80 ? "bg-[#34c759]" : "bg-[#ffcc00]"
-              }`}
+              class={`h-full w-[var(--battery-level)] transition-[width] duration-1000 ease-out ${twin.battery_health > 80 ? "bg-[#34c759]" : "bg-[#ffcc00]"
+                }`}
               style={{ "--battery-level": `${twin.battery_health}%` }}
             />
           </div>
