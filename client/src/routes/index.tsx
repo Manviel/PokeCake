@@ -22,11 +22,13 @@ export default component$(() => {
   const alertMessage = useSignal("");
   const alertType = useSignal<"success" | "error" | "info">("info");
 
-  const notify = $((message: string, type: "success" | "error" | "info" = "info") => {
-    alertMessage.value = message;
-    alertType.value = type;
-    showAlert.value = true;
-  });
+  const notify = $(
+    (message: string, type: "success" | "error" | "info" = "info") => {
+      alertMessage.value = message;
+      alertType.value = type;
+      showAlert.value = true;
+    },
+  );
 
   // Core Data Fetching
   const loadTwins = $(async () => {
@@ -58,8 +60,12 @@ export default component$(() => {
 
   const handleTwinUpdate = $(async (updatedTwinId?: string) => {
     await loadTwins();
-    if (updatedTwinId && selectedTwin.value && selectedTwin.value._id === updatedTwinId) {
-      const freshTwin = twins.value.find(t => t._id === updatedTwinId);
+    if (
+      updatedTwinId &&
+      selectedTwin.value &&
+      selectedTwin.value._id === updatedTwinId
+    ) {
+      const freshTwin = twins.value.find((t) => t._id === updatedTwinId);
       if (freshTwin) {
         selectedTwin.value = freshTwin;
       }
@@ -69,7 +75,7 @@ export default component$(() => {
   const handlePairDevice = $(async () => {
     isPairing.value = true;
     // Simulate scanning delay for UX
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     try {
       await pairNewDevice();
@@ -86,21 +92,30 @@ export default component$(() => {
   });
 
   return (
-    <div class="mt-8 relative">
-      <div class="absolute top-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
-        <div class="pointer-events-auto max-w-md w-full">
-          <Alert show={showAlert} message={alertMessage} type={alertType.value} />
+    <div class="relative mt-8">
+      <div class="pointer-events-none absolute top-0 right-0 left-0 z-50 flex justify-center">
+        <div class="pointer-events-auto w-full max-w-md">
+          <Alert
+            show={showAlert}
+            message={alertMessage}
+            type={alertType.value}
+          />
         </div>
       </div>
-      <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-8 text-center">Your Digital Twins</h1>
+      <h1 class="mb-8 text-center text-3xl font-bold tracking-tight md:text-5xl lg:text-6xl">
+        Your Digital Twins
+      </h1>
 
       {isLoading.value ? (
-        <div class="text-center p-8">Loading devices...</div>
+        <div class="p-8 text-center">Loading devices...</div>
       ) : (
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-16">
+        <div class="grid grid-cols-1 gap-6 pb-16 sm:grid-cols-2 lg:grid-cols-3">
           {twins.value.length === 0 ? (
-            <div class="glass col-span-full flex flex-col items-center text-center p-12 rounded-[18px]">
-              <p class="text-apple-text-secondary max-w-md">No digital twins found. Pair your first device to start tracking its telemetry and status in real-time.</p>
+            <div class="glass col-span-full flex flex-col items-center rounded-[18px] p-12 text-center">
+              <p class="text-apple-text-secondary max-w-md">
+                No digital twins found. Pair your first device to start tracking
+                its telemetry and status in real-time.
+              </p>
               <Button
                 look="primary"
                 class="mt-6 flex items-center gap-2"
@@ -109,7 +124,7 @@ export default component$(() => {
               >
                 {isPairing.value ? (
                   <>
-                    <span class="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full"></span>
+                    <span class="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
                     Scanning...
                   </>
                 ) : (
@@ -132,20 +147,24 @@ export default component$(() => {
               <button
                 onClick$={handlePairDevice}
                 disabled={isPairing.value}
-                class="bg-apple-card rounded-[18px] p-6 border border-dashed border-apple-border flex flex-col items-center justify-center min-h-[300px] hover:bg-black/5 transition-colors group glass"
+                class="bg-apple-card border-apple-border group glass flex min-h-[300px] flex-col items-center justify-center rounded-[18px] border border-dashed p-6 transition-colors hover:bg-black/5"
               >
                 {isPairing.value ? (
                   <div class="flex flex-col items-center gap-4">
-                    <Loader2Icon class="w-10 h-10 animate-spin text-apple-accent" />
-                    <span class="font-medium text-apple-text">Scanning...</span>
+                    <Loader2Icon class="text-apple-accent h-10 w-10 animate-spin" />
+                    <span class="text-apple-text font-medium">Scanning...</span>
                   </div>
                 ) : (
                   <>
-                    <div class="w-12 h-12 rounded-full bg-apple-accent/10 flex items-center justify-center text-apple-accent mb-4 group-hover:scale-110 transition-transform">
+                    <div class="bg-apple-accent/10 text-apple-accent mb-4 flex h-12 w-12 items-center justify-center rounded-full transition-transform group-hover:scale-110">
                       <PlusIcon size={24} />
                     </div>
-                    <span class="font-medium text-apple-text">Pair New Device</span>
-                    <span class="text-xs text-apple-text-secondary mt-2">Scan for nearby Apple devices</span>
+                    <span class="text-apple-text font-medium">
+                      Pair New Device
+                    </span>
+                    <span class="text-apple-text-secondary mt-2 text-xs">
+                      Scan for nearby Apple devices
+                    </span>
                   </>
                 )}
               </button>
@@ -155,7 +174,11 @@ export default component$(() => {
       )}
 
       <SpecsModal show={showSpecs} twin={selectedTwin.value} />
-      <ManageModal show={showManage} twin={selectedTwin.value} onUpdate$={handleTwinUpdate} />
+      <ManageModal
+        show={showManage}
+        twin={selectedTwin.value}
+        onUpdate$={handleTwinUpdate}
+      />
     </div>
   );
 });
