@@ -54,3 +54,24 @@ export const pairNewDevice = async (): Promise<void> => {
         throw new Error("Failed to pair device");
     }
 };
+
+export const unpairDevice = async (id: string): Promise<void> => {
+    const response = await fetch(`${API_BASE}/twins/${id}`, {
+        method: "DELETE",
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to unpair device");
+    }
+};
+
+export const runDiagnostics = async (id: string): Promise<{ healthy: boolean; message: string }> => {
+    const response = await fetch(`${API_BASE}/twins/${id}/diagnostics`, {
+        method: "POST",
+    });
+
+    if (!response.ok) {
+        throw new Error("Diagnostics failed");
+    }
+    return response.json();
+};

@@ -3,6 +3,8 @@ from models.twin_models import ProductTwin, ProductTwinCreate, ProductTwinUpdate
 from database import get_database
 from typing import List
 from bson import ObjectId
+import asyncio
+import random
 
 router = APIRouter()
 
@@ -63,3 +65,25 @@ async def delete_twin(twin_id: str, db=Depends(get_database)):
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Twin not found")
     return None
+
+@router.post("/twins/{twin_id}/diagnostics")
+async def run_diagnostics(twin_id: str, db=Depends(get_database)):
+    if not ObjectId.is_valid(twin_id):
+        raise HTTPException(status_code=400, detail="Invalid ID format")
+
+    # Verify existance
+    twin = await db.twins.find_one({"_id": ObjectId(twin_id)})
+    if not twin:
+        raise HTTPException(status_code=404, detail="Twin not found")
+
+    # Simulate processing time
+    await asyncio.sleep(2)
+    
+    # Simulate random result
+    is_healthy = random.random() > 0.1 # 90% chance of health
+    
+    return {
+        "status": "completed",
+        "healthy": is_healthy,
+        "message": "Diagnostics passed successfully" if is_healthy else "Hardware anomaly detected in sensor array"
+    }

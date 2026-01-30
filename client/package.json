@@ -31,6 +31,7 @@
     "class-variance-authority": "^0.7.1",
     "eslint": "9.32.0",
     "eslint-plugin-qwik": "^1.18.0",
+    "lucide-qwik": "^1.0.0",
     "prettier": "3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "tailwindcss": "^4.1.4",

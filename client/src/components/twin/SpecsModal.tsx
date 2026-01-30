@@ -1,4 +1,5 @@
 import { component$, type Signal } from "@builder.io/qwik";
+import { XIcon } from "lucide-qwik";
 import { Modal } from "../ui/modal/modal";
 import type { ProductTwin } from "../../services/api";
 
@@ -22,7 +23,7 @@ export const SpecsModal = component$<SpecsModalProps>(({ show, twin }) => {
                                 onClick$={() => (show.value = false)}
                                 class="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center hover:bg-black/10 transition-colors"
                             >
-                                ✕
+                                <XIcon size={20} />
                             </button>
                         </div>
 
