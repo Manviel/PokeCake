@@ -13,7 +13,7 @@ export const Modal = {
         return (
             <HeadlessModal.Panel
                 class={[
-                    'fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md bg-black/20',
+                    'fixed inset-0 z-[100] flex items-center justify-center backdrop-blur-md bg-black/20 data-[state=closed]:hidden w-full h-full border-none m-0 max-w-none max-h-none',
                     className,
                 ]}
             >

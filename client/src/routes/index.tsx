@@ -1,31 +1,25 @@
 import { component$, useSignal, useVisibleTask$, $ } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
 import { Button } from "../components/ui/button/button";
-import { Modal } from "../components/ui/modal/modal";
-
-interface ProductTwin {
-  _id: string;
-  name: string;
-  model_identifier: string;
-  serial_number: string;
-  os_version: string;
-  battery_health: number;
-  warranty_status: string;
-  last_synced: string;
-}
+import { fetchTwins, pairNewDevice, type ProductTwin } from "../services/api";
+import { TwinCard } from "../components/twin/TwinCard";
+import { SpecsModal } from "../components/twin/SpecsModal";
+import { ManageModal } from "../components/twin/ManageModal";
 
 export default component$(() => {
   const twins = useSignal<ProductTwin[]>([]);
   const isLoading = useSignal(true);
   const isPairing = useSignal(false);
 
-  const fetchTwins = $(async () => {
+  const selectedTwin = useSignal<ProductTwin | null>(null);
+  const showSpecs = useSignal(false);
+  const showManage = useSignal(false);
+
+  // Core Data Fetching
+  const loadTwins = $(async () => {
     isLoading.value = true;
     try {
-      const response = await fetch("http://localhost:8000/api/v1/twins");
-      if (response.ok) {
-        twins.value = await response.json();
-      }
+      twins.value = await fetchTwins();
     } catch (error) {
       console.error("Failed to fetch twins:", error);
     } finally {
@@ -33,16 +27,12 @@ export default component$(() => {
     }
   });
 
-  // Fetch twins on client side
+  // Initial Load
   useVisibleTask$(async () => {
-    await fetchTwins();
+    await loadTwins();
   });
 
-  const selectedTwin = useSignal<ProductTwin | null>(null);
-  const showSpecs = useSignal(false);
-  const showManage = useSignal(false);
-  const isUpdating = useSignal(false);
-
+  // Handlers
   const handleOpenSpecs = $((twin: ProductTwin) => {
     selectedTwin.value = twin;
     showSpecs.value = true;
@@ -53,65 +43,22 @@ export default component$(() => {
     showManage.value = true;
   });
 
-  const handleUpdateOS = $(async () => {
-    if (!selectedTwin.value) return;
-    isUpdating.value = true;
-
-    // Simulate update process
-    await new Promise(resolve => setTimeout(resolve, 3000));
-
-    try {
-      const response = await fetch(`http://localhost:8000/api/v1/twins/${selectedTwin.value._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ os_version: "iOS 18.0 Beta" })
-      });
-
-      if (response.ok) {
-        await fetchTwins();
-        showManage.value = false;
-        alert("OS Updated successfully!");
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      isUpdating.value = false;
-    }
+  const handleTwinUpdate = $(async () => {
+    await loadTwins();
   });
 
   const handlePairDevice = $(async () => {
     isPairing.value = true;
-    // Simulate scanning delay
+    // Simulate scanning delay for UX
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     try {
-      const mockDevice = {
-        name: "iPhone 15 Pro",
-        model_identifier: "iPhone16,1",
-        serial_number: `QX${Math.random().toString(36).substring(2, 10).toUpperCase()}`,
-        os_version: "iOS 17.4",
-        battery_health: 98,
-        warranty_status: "AppleCare+ Active",
-        last_synced: new Date().toISOString()
-      };
-
-      const response = await fetch("http://localhost:8000/api/v1/twins", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(mockDevice),
-      });
-
-      if (response.ok) {
-        await fetchTwins();
-        alert("New device paired successfully!");
-      } else {
-        alert("Failed to pair device. Please try again.");
-      }
+      await pairNewDevice();
+      await loadTwins();
+      alert("New device paired successfully!");
     } catch (error) {
       console.error("Pairing error:", error);
-      alert("An error occurred during pairing.");
+      alert("Failed to pair device. Please try again.");
     } finally {
       isPairing.value = false;
     }
@@ -147,58 +94,12 @@ export default component$(() => {
           ) : (
             <>
               {twins.value.map((twin) => (
-                <div key={twin._id} class="bg-apple-card rounded-[18px] p-6 transition-transform duration-300 hover:scale-[1.02] border border-apple-border glass">
-                  <div class="text-xs text-apple-accent font-semibold mb-2">
-                    {twin.model_identifier}
-                  </div>
-                  <h2 class="text-2xl font-semibold mb-4">{twin.name}</h2>
-
-                  <div class="flex flex-col gap-2">
-                    <div class="flex justify-between">
-                      <span class="text-apple-text-secondary">Battery Health</span>
-                      <span class="font-medium">{twin.battery_health}%</span>
-                    </div>
-                    <div class="h-1 bg-black/10 rounded-full overflow-hidden">
-                      <div
-                        class={`h-full transition-[width] duration-1000 ease-out w-[var(--battery-level)] ${twin.battery_health > 80 ? 'bg-[#34c759]' : 'bg-[#ffcc00]'
-                          }`}
-                        style={{ "--battery-level": `${twin.battery_health}%` }}
-                      />
-                    </div>
-
-                    <div class="flex justify-between mt-2">
-                      <span class="text-apple-text-secondary">OS Version</span>
-                      <span>{twin.os_version}</span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span class="text-apple-text-secondary">Serial</span>
-                      <span class="font-mono">{twin.serial_number}</span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span class="text-apple-text-secondary">Warranty</span>
-                      <span class={twin.warranty_status.includes('Active') ? 'text-[#34c759]' : ''}>
-                        {twin.warranty_status}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="mt-6 flex gap-4 text-xs">
-                    <Button
-                      look="primary"
-                      onClick$={() => handleOpenManage(twin)}
-                      class="flex-1"
-                    >
-                      Manage
-                    </Button>
-                    <Button
-                      look="secondary"
-                      onClick$={() => handleOpenSpecs(twin)}
-                      class="flex-1"
-                    >
-                      Specs
-                    </Button>
-                  </div>
-                </div>
+                <TwinCard
+                  key={twin._id}
+                  twin={twin}
+                  onManage$={handleOpenManage}
+                  onSpecs$={handleOpenSpecs}
+                />
               ))}
 
               {/* Add New Device Card */}
@@ -229,126 +130,9 @@ export default component$(() => {
           )}
         </div>
       )}
-      {/* Modals using Qwik UI components */}
-      {showSpecs.value && (
-        <Modal.Root show={showSpecs}>
-          <Modal.Panel>
-            {selectedTwin.value && (
-              <div class="p-8">
-                <div class="flex justify-between items-start mb-6">
-                  <div>
-                    <Modal.Title>{selectedTwin.value.name}</Modal.Title>
-                    <p class="text-apple-accent font-semibold">{selectedTwin.value.model_identifier}</p>
-                  </div>
-                  <button
-                    onClick$={() => (showSpecs.value = false)}
-                    class="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center hover:bg-black/10 transition-colors"
-                  >
-                    ✕
-                  </button>
-                </div>
 
-                <div class="grid grid-cols-2 gap-6">
-                  <div class="bg-white/50 p-4 rounded-2xl border border-white/40">
-                    <p class="text-xs text-apple-text-secondary uppercase mb-1 font-bold">Serial Number</p>
-                    <p class="font-mono">{selectedTwin.value.serial_number}</p>
-                  </div>
-                  <div class="bg-white/50 p-4 rounded-2xl border border-white/40">
-                    <p class="text-xs text-apple-text-secondary uppercase mb-1 font-bold">OS Version</p>
-                    <p>{selectedTwin.value.os_version}</p>
-                  </div>
-                  <div class="bg-white/50 p-4 rounded-2xl border border-white/40">
-                    <p class="text-xs text-apple-text-secondary uppercase mb-1 font-bold">Hardware ID</p>
-                    <p>{selectedTwin.value.model_identifier}</p>
-                  </div>
-                  <div class="bg-white/50 p-4 rounded-2xl border border-white/40">
-                    <p class="text-xs text-apple-text-secondary uppercase mb-1 font-bold">Warranty</p>
-                    <p>{selectedTwin.value.warranty_status}</p>
-                  </div>
-                </div>
-
-                <div class="mt-8 pt-6 border-t border-black/5">
-                  <h3 class="text-sm font-bold uppercase text-apple-text-secondary mb-4">Technical Specifications</h3>
-                  <ul class="space-y-3 text-sm">
-                    <li class="flex justify-between">
-                      <span class="text-apple-text-secondary">Processor</span>
-                      <span class="font-medium">A17 Pro Chip</span>
-                    </li>
-                    <li class="flex justify-between">
-                      <span class="text-apple-text-secondary">Storage Capacity</span>
-                      <span class="font-medium">256 GB</span>
-                    </li>
-                    <li class="flex justify-between">
-                      <span class="text-apple-text-secondary">Display</span>
-                      <span class="font-medium">6.1" Super Retina XDR</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            )}
-          </Modal.Panel>
-        </Modal.Root>
-      )}
-
-      {showManage.value && (
-        <Modal.Root show={showManage}>
-          <Modal.Panel>
-            {selectedTwin.value && (
-              <div class="p-8">
-                <div class="flex justify-between items-start mb-8">
-                  <div>
-                    <Modal.Title>Manage Device</Modal.Title>
-                    <Modal.Description>System controls for {selectedTwin.value.name}</Modal.Description>
-                  </div>
-                  <button
-                    onClick$={() => (showManage.value = false)}
-                    class="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center hover:bg-black/10 transition-colors"
-                  >
-                    ✕
-                  </button>
-                </div>
-
-                <div class="space-y-4">
-                  <div class="flex items-center justify-between p-4 bg-white/50 rounded-2xl border border-white/40">
-                    <div>
-                      <p class="font-semibold">Software Update</p>
-                      <p class="text-xs text-apple-text-secondary">Current: {selectedTwin.value.os_version}</p>
-                    </div>
-                    <Button
-                      look="primary"
-                      size="sm"
-                      onClick$={handleUpdateOS}
-                      disabled={isUpdating.value}
-                    >
-                      {isUpdating.value ? "Updating..." : "Update OS"}
-                    </Button>
-                  </div>
-
-                  <div class="flex items-center justify-between p-4 bg-white/50 rounded-2xl border border-white/40">
-                    <div>
-                      <p class="font-semibold">Simulate Diagnostics</p>
-                      <p class="text-xs text-apple-text-secondary">Run hardware health check</p>
-                    </div>
-                    <Button look="secondary" size="sm">
-                      Run
-                    </Button>
-                  </div>
-
-                  <div class="flex items-center justify-between p-4 bg-red-50/50 rounded-2xl border border-red-100/40">
-                    <div>
-                      <p class="font-semibold text-red-600">Unpair Device</p>
-                      <p class="text-xs text-red-400">Remove from digital twin network</p>
-                    </div>
-                    <Button look="danger" size="sm">
-                      Disconnect
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </Modal.Panel>
-        </Modal.Root>
-      )}
+      <SpecsModal show={showSpecs} twin={selectedTwin.value} />
+      <ManageModal show={showManage} twin={selectedTwin.value} onUpdate$={handleTwinUpdate} />
     </div>
   );
 });
