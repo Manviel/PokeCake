@@ -1,18 +1,19 @@
+import uuid
 from pydantic import BaseModel, Field
-from typing import Optional, List
+from typing import Optional
 from datetime import datetime
 
-class ProductTwinBase(BaseModel):
-    name: str = Field(..., example="iPhone 15 Pro")
-    model_identifier: str = Field(..., example="iPhone16,1")
-    serial_number: str = Field(..., example="QX12345678")
-    os_version: str = Field(..., example="iOS 17.4")
-    battery_health: int = Field(..., ge=0, le=100, example=98)
-    warranty_status: str = Field(..., example="AppleCare+ Active")
-    last_synced: datetime = Field(default_factory=datetime.utcnow)
+def generate_serial():
+    return f"QX{uuid.uuid4().hex[:8].upper()}"
 
-class ProductTwinCreate(ProductTwinBase):
-    pass
+class ProductTwinCreate(BaseModel):
+    name: str = Field(default="iPhone 15 Pro")
+    model_identifier: str = Field(default="iPhone16,1")
+    serial_number: str = Field(default_factory=generate_serial)
+    os_version: str = Field(default="iOS 17.4")
+    battery_health: int = Field(default=100, ge=0, le=100)
+    warranty_status: str = Field(default="AppleCare+ Active")
+    last_synced: datetime = Field(default_factory=datetime.utcnow)
 
 class ProductTwinUpdate(BaseModel):
     name: Optional[str] = None
@@ -20,8 +21,15 @@ class ProductTwinUpdate(BaseModel):
     battery_health: Optional[int] = None
     warranty_status: Optional[str] = None
 
-class ProductTwin(ProductTwinBase):
+class ProductTwin(BaseModel):
     id: str = Field(..., alias="_id")
+    name: str
+    model_identifier: str
+    serial_number: str
+    os_version: str
+    battery_health: int
+    warranty_status: str
+    last_synced: datetime
 
     class Config:
         populate_by_name = True

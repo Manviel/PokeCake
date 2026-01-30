@@ -35,22 +35,16 @@ export const updateTwinOs = async (
 };
 
 export const pairNewDevice = async (): Promise<void> => {
-  const mockDevice = {
-    name: "iPhone 15 Pro",
-    model_identifier: "iPhone16,1",
-    serial_number: `QX${Math.random().toString(36).substring(2, 10).toUpperCase()}`,
-    os_version: "iOS 17.4",
-    battery_health: 98,
-    warranty_status: "AppleCare+ Active",
-    last_synced: new Date().toISOString(),
-  };
-
+  // Let the API handle the generation of serials, model identifiers, etc.
+  // This follows real business logic where the server registers the hardware.
   const response = await fetch(`${API_BASE}/twins`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(mockDevice),
+    body: JSON.stringify({
+      name: "iPhone 15 Pro",
+    }),
   });
 
   if (!response.ok) {

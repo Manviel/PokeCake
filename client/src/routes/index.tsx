@@ -55,14 +55,13 @@ export default component$(() => {
 
   const handleTwinUpdate = $(async (updatedTwinId?: string) => {
     await loadTwins();
-    if (
-      updatedTwinId &&
-      selectedTwin.value &&
-      selectedTwin.value._id === updatedTwinId
-    ) {
+    if (updatedTwinId) {
       const freshTwin = twins.value.find((t) => t._id === updatedTwinId);
-      if (freshTwin) {
+      if (freshTwin && selectedTwin.value?._id === updatedTwinId) {
         selectedTwin.value = freshTwin;
+      } else if (!freshTwin) {
+        // If the twin is gone, it was likely unpaired/deleted
+        notify("Device unpaired and removed successfully.", "success");
       }
     }
   });
