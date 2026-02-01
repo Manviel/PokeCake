@@ -1,6 +1,7 @@
 import {
   component$,
   useSignal,
+  useTask$,
   $,
   type PropFunction,
   type Signal,
@@ -41,6 +42,19 @@ export const ManageModal = component$<ManageModalProps>(
 
     const updateStatus = useSignal("Update OS");
     const showUnpairConfirm = useSignal(false);
+    const isDataLive = useSignal(false);
+ 
+    // Data stream liveness detection
+    useTask$(({ track, cleanup }) => {
+      track(() => twin?.last_synced);
+      if (twin) {
+        isDataLive.value = true;
+        const timeout = setTimeout(() => {
+          isDataLive.value = false;
+        }, 4000);
+        cleanup(() => clearTimeout(timeout));
+      }
+    });
 
     const handleUpdateOS = $(async () => {
       if (!twin) return;
@@ -133,6 +147,113 @@ export const ManageModal = component$<ManageModalProps>(
                   message={alertMessage}
                   type={alertType.value}
                 />
+
+                {/* Real-time Telemetry Dashboard */}
+                <div class="mb-8 overflow-hidden rounded-2xl bg-black/5 p-6 backdrop-blur-sm">
+                  <div class="mb-4 flex items-center justify-between">
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-black/40">
+                      Live Telemetry
+                    </h3>
+                    <div class="flex items-center gap-2">
+                       <span class="relative flex h-2 w-2">
+                         {isDataLive.value && (
+                           <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+                         )}
+                         <span
+                           class={`relative inline-flex h-2 w-2 rounded-full ${
+                             isDataLive.value ? "bg-green-500" : "bg-black/20"
+                           }`}
+                         ></span>
+                       </span>
+                       <span
+                         class={`text-[10px] font-medium uppercase ${
+                           isDataLive.value ? "text-green-600" : "text-black/40"
+                         }`}
+                       >
+                         {isDataLive.value
+                           ? "Receiving Hardware Data"
+                           : "Hardware Idle"}
+                       </span>
+                     </div>
+                  </div>
+
+                  <div class="grid grid-cols-3 gap-4">
+                    {/* CPU Usage */}
+                    <div class="flex flex-col gap-1">
+                      <span class="text-[10px] font-medium text-black/40 uppercase">
+                        CPU Load
+                      </span>
+                      <div class="flex items-end gap-1">
+                        <span
+                          class={`text-2xl font-semibold tabular-nums ${
+                            twin.cpu_usage > 80 ? "text-red-500" : "text-black"
+                          }`}
+                        >
+                          {twin.cpu_usage}%
+                        </span>
+                      </div>
+                      <div class="h-1 w-full overflow-hidden rounded-full bg-black/10">
+                        <div
+                          class={`h-full transition-all duration-500 ${
+                            twin.cpu_usage > 80 ? "bg-red-500" : "bg-black"
+                          }`}
+                          style={{ width: `${twin.cpu_usage}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Temperature */}
+                    <div class="flex flex-col gap-1">
+                      <span class="text-[10px] font-medium text-black/40 uppercase">
+                        Temperature
+                      </span>
+                      <div class="flex items-end gap-1">
+                        <span
+                          class={`text-2xl font-semibold tabular-nums ${
+                            twin.temperature > 50 ? "text-orange-500" : "text-black"
+                          }`}
+                        >
+                          {twin.temperature}°C
+                        </span>
+                      </div>
+                      <div class="h-1 w-full overflow-hidden rounded-full bg-black/10">
+                        <div
+                          class={`h-full transition-all duration-500 ${
+                            twin.temperature > 50 ? "bg-orange-500" : "bg-blue-500"
+                          }`}
+                          style={{ width: `${Math.min(100, twin.temperature * 2)}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Battery */}
+                    <div class="flex flex-col gap-1">
+                      <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-medium text-black/40 uppercase">
+                          Battery
+                        </span>
+                        {twin.is_charging && (
+                          <span class="animate-pulse text-[10px] font-bold text-green-600">
+                            ⚡
+                          </span>
+                        )}
+                      </div>
+                      <div class="flex items-end gap-1">
+                        <span class="text-2xl font-semibold tabular-nums">
+                          {twin.battery_health}%
+                        </span>
+                      </div>
+                      <div class="h-1 w-full overflow-hidden rounded-full bg-black/10">
+                        <div
+                          class={`h-full transition-all duration-500 ${
+                            twin.battery_health < 20 ? "bg-red-500" : "bg-green-500"
+                          }`}
+                          style={{ width: `${twin.battery_health}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 <div class="space-y-4">
                   <ManageAction

@@ -1,5 +1,5 @@
-import { component$, useSignal, useTask$, $ } from "@builder.io/qwik";
-import type { DocumentHead } from "@builder.io/qwik-city";
+import { component$, useSignal, $, useVisibleTask$ } from "@builder.io/qwik";
+import { routeLoader$, type DocumentHead } from "@builder.io/qwik-city";
 import { Button } from "../components/ui/button/button";
 import { fetchTwins, pairNewDevice, type ProductTwin } from "../services/api";
 import { TwinCard } from "../components/twin/TwinCard";
@@ -8,10 +8,17 @@ import { ManageModal } from "../components/twin/ManageModal";
 import { PlusIcon, Loader2Icon } from "lucide-qwik";
 import { Alert } from "../components/ui/alert/alert";
 import { useAlert } from "../hooks/useAlert";
+import { io } from "socket.io-client";
+import { getSocketUrl } from "../services/api";
+
+export const useTwinsLoader = routeLoader$(async () => {
+  return await fetchTwins();
+});
 
 export default component$(() => {
-  const twins = useSignal<ProductTwin[]>([]);
-  const isLoading = useSignal(true);
+  const initialTwins = useTwinsLoader();
+  const twins = useSignal<ProductTwin[]>(initialTwins.value);
+  const isLoading = useSignal(false);
   const isPairing = useSignal(false);
 
   const selectedTwin = useSignal<ProductTwin | null>(null);
@@ -37,9 +44,39 @@ export default component$(() => {
     }
   });
 
-  // Initial Load
-  useTask$(async () => {
-    await loadTwins();
+  // Real-time updates via Socket.IO
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(({ cleanup }) => {
+    const socket = io(getSocketUrl(), {
+      transports: ["websocket"], // Force WebSocket to avoid polling issues
+    });
+
+    socket.on("connect", () => {
+      console.log("Connected to Real-time Twin Stream");
+    });
+
+    socket.on("telemetry_update", (data: Partial<ProductTwin> & { _id: string }) => {
+       // Update the specific twin in the local state
+       // We create a new array to ensure Qwik reactivity detects the change
+       const updatedTwins = twins.value.map(t => {
+          if (t._id === data._id) {
+             const updated = { ...t, ...data };
+             
+             // If this is the twin currently being managed/viewed, update the selection signal too
+             if (selectedTwin.value?._id === data._id) {
+                selectedTwin.value = updated;
+             }
+             
+             return updated;
+          }
+          return t;
+       });
+       twins.value = [...updatedTwins];
+    });
+
+    cleanup(() => {
+      socket.disconnect();
+    });
   });
 
   // Handlers

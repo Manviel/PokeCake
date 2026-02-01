@@ -4,3 +4,7 @@ motor
 dnspython
 pydantic
 python-dotenv
+aio-pika
+python-socketio
+python-engineio
+bidict

@@ -5,6 +5,9 @@ from typing import List
 from bson import ObjectId
 import asyncio
 import random
+from datetime import datetime
+
+from services.rabbitmq import publish_command
 
 router = APIRouter()
 
@@ -71,19 +74,20 @@ async def run_diagnostics(twin_id: str, db=Depends(get_database)):
     if not ObjectId.is_valid(twin_id):
         raise HTTPException(status_code=400, detail="Invalid ID format")
 
-    # Verify existance
+    # Verify existence
     twin = await db.twins.find_one({"_id": ObjectId(twin_id)})
     if not twin:
         raise HTTPException(status_code=404, detail="Twin not found")
 
-    # Simulate processing time
-    await asyncio.sleep(2)
-    
-    # Simulate random result
-    is_healthy = random.random() > 0.1 # 90% chance of health
+    # Send command to RabbitMQ to trigger intensive simulation on the "physical" device
+    await publish_command({
+        "target_serial": twin["serial_number"],
+        "action": "RUN_DIAGNOSTICS",
+        "timestamp": str(datetime.utcnow())
+    })
     
     return {
-        "status": "completed",
-        "healthy": is_healthy,
-        "message": "Diagnostics passed successfully" if is_healthy else "Hardware anomaly detected in sensor array"
+        "status": "triggered",
+        "healthy": True,
+        "message": "Diagnostics command dispatched to hardware via RabbitMQ."
     }

@@ -48,12 +48,6 @@ export const SpecsModal = component$<SpecsModalProps>(({ show, twin }) => {
                 </p>
                 <p>{twin.model_identifier}</p>
               </div>
-              <div class="rounded-2xl border border-white/40 bg-white/50 p-4">
-                <p class="text-apple-text-secondary mb-1 text-xs font-bold uppercase">
-                  Warranty
-                </p>
-                <p>{twin.warranty_status}</p>
-              </div>
             </div>
 
             <div class="mt-8 border-t border-black/5 pt-6">

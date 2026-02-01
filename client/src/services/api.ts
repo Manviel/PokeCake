@@ -5,11 +5,32 @@ export interface ProductTwin {
   serial_number: string;
   os_version: string;
   battery_health: number;
-  warranty_status: string;
+  cpu_usage: number;
+  temperature: number;
+  is_charging: boolean;
   last_synced: string;
 }
 
-const API_BASE = "http://localhost:8000/api/v1";
+const getBaseUrl = () => {
+  if (typeof window !== "undefined") {
+    // Browser
+    return import.meta.env.VITE_API_URL + "/api/v1";
+  }
+
+  // Server (SSR)
+  // When running locally, localhost works. 
+  // When running in Docker, we set VITE_INTERNAL_API_URL to 'http://api:8000'
+  return import.meta.env.VITE_INTERNAL_API_URL + "/api/v1";
+};
+
+export const getSocketUrl = () => {
+    if (typeof window !== "undefined") {
+        return import.meta.env.VITE_API_URL || "http://localhost:8000";
+    }
+    return "http://localhost:8000";
+}
+
+const API_BASE = getBaseUrl();
 
 export const fetchTwins = async (): Promise<ProductTwin[]> => {
   const response = await fetch(`${API_BASE}/twins`);
@@ -17,6 +38,21 @@ export const fetchTwins = async (): Promise<ProductTwin[]> => {
     throw new Error("Failed to fetch twins");
   }
   return response.json();
+};
+
+export const updateTwin = async (
+  id: string,
+  updates: Partial<ProductTwin>,
+): Promise<void> => {
+  const response = await fetch(`${API_BASE}/twins/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updates),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update twin");
+  }
 };
 
 export const updateTwinOs = async (

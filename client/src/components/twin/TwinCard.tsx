@@ -19,33 +19,17 @@ export const TwinCard = component$<TwinCardProps>(
 
         <div class="flex flex-col gap-2">
           <div class="flex justify-between">
-            <span class="text-apple-text-secondary">Battery Health</span>
-            <span class="font-medium">{twin.battery_health}%</span>
-          </div>
-          <div class="h-1 overflow-hidden rounded-full bg-black/10">
-            <div
-              class={`h-full w-[var(--battery-level)] transition-[width] duration-1000 ease-out ${twin.battery_health > 80 ? "bg-[#34c759]" : "bg-[#ffcc00]"
-                }`}
-              style={{ "--battery-level": `${twin.battery_health}%` }}
-            />
-          </div>
-
-          <div class="mt-2 flex justify-between">
             <span class="text-apple-text-secondary">OS Version</span>
-            <span>{twin.os_version}</span>
+            <span class="font-medium">{twin.os_version}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-apple-text-secondary">Serial</span>
-            <span class="font-mono">{twin.serial_number}</span>
+            <span class="font-mono text-[10px]">{twin.serial_number}</span>
           </div>
-          <div class="flex justify-between">
-            <span class="text-apple-text-secondary">Warranty</span>
-            <span
-              class={
-                twin.warranty_status.includes("Active") ? "text-[#34c759]" : ""
-              }
-            >
-              {twin.warranty_status}
+          <div class="mt-2 flex items-center gap-2">
+            <span class="flex h-2 w-2 rounded-full bg-[#34c759]"></span>
+            <span class="text-[10px] font-medium text-[#34c759] uppercase tracking-wider">
+              Connected
             </span>
           </div>
         </div>

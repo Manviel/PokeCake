@@ -12,14 +12,18 @@ class ProductTwinCreate(BaseModel):
     serial_number: str = Field(default_factory=generate_serial)
     os_version: str = Field(default="iOS 17.4")
     battery_health: int = Field(default=100, ge=0, le=100)
-    warranty_status: str = Field(default="AppleCare+ Active")
+    cpu_usage: int = Field(default=0, ge=0, le=100)
+    temperature: float = Field(default=25.0)
+    is_charging: bool = Field(default=False)
     last_synced: datetime = Field(default_factory=datetime.utcnow)
 
 class ProductTwinUpdate(BaseModel):
     name: Optional[str] = None
     os_version: Optional[str] = None
     battery_health: Optional[int] = None
-    warranty_status: Optional[str] = None
+    cpu_usage: Optional[int] = None
+    temperature: Optional[float] = None
+    is_charging: Optional[bool] = None
 
 class ProductTwin(BaseModel):
     id: str = Field(..., alias="_id")
@@ -28,7 +32,9 @@ class ProductTwin(BaseModel):
     serial_number: str
     os_version: str
     battery_health: int
-    warranty_status: str
+    cpu_usage: int = 0
+    temperature: float = 25.0
+    is_charging: bool = False
     last_synced: datetime
 
     class Config:
