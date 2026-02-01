@@ -18,17 +18,17 @@ const getBaseUrl = () => {
   }
 
   // Server (SSR)
-  // When running locally, localhost works. 
+  // When running locally, localhost works.
   // When running in Docker, we set VITE_INTERNAL_API_URL to 'http://api:8000'
   return import.meta.env.VITE_INTERNAL_API_URL + "/api/v1";
 };
 
 export const getSocketUrl = () => {
-    if (typeof window !== "undefined") {
-        return import.meta.env.VITE_API_URL || "http://localhost:8000";
-    }
-    return "http://localhost:8000";
-}
+  if (typeof window !== "undefined") {
+    return import.meta.env.VITE_API_URL || "http://localhost:8000";
+  }
+  return "http://localhost:8000";
+};
 
 const API_BASE = getBaseUrl();
 

@@ -55,24 +55,27 @@ export default component$(() => {
       console.log("Connected to Real-time Twin Stream");
     });
 
-    socket.on("telemetry_update", (data: Partial<ProductTwin> & { _id: string }) => {
-       // Update the specific twin in the local state
-       // We create a new array to ensure Qwik reactivity detects the change
-       const updatedTwins = twins.value.map(t => {
+    socket.on(
+      "telemetry_update",
+      (data: Partial<ProductTwin> & { _id: string }) => {
+        // Update the specific twin in the local state
+        // We create a new array to ensure Qwik reactivity detects the change
+        const updatedTwins = twins.value.map((t) => {
           if (t._id === data._id) {
-             const updated = { ...t, ...data };
-             
-             // If this is the twin currently being managed/viewed, update the selection signal too
-             if (selectedTwin.value?._id === data._id) {
-                selectedTwin.value = updated;
-             }
-             
-             return updated;
+            const updated = { ...t, ...data };
+
+            // If this is the twin currently being managed/viewed, update the selection signal too
+            if (selectedTwin.value?._id === data._id) {
+              selectedTwin.value = updated;
+            }
+
+            return updated;
           }
           return t;
-       });
-       twins.value = [...updatedTwins];
-    });
+        });
+        twins.value = [...updatedTwins];
+      },
+    );
 
     cleanup(() => {
       socket.disconnect();

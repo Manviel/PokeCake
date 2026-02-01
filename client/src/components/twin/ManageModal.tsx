@@ -43,7 +43,7 @@ export const ManageModal = component$<ManageModalProps>(
     const updateStatus = useSignal("Update OS");
     const showUnpairConfirm = useSignal(false);
     const isDataLive = useSignal(false);
- 
+
     // Data stream liveness detection
     useTask$(({ track, cleanup }) => {
       track(() => twin?.last_synced);
@@ -151,30 +151,30 @@ export const ManageModal = component$<ManageModalProps>(
                 {/* Real-time Telemetry Dashboard */}
                 <div class="mb-8 overflow-hidden rounded-2xl bg-black/5 p-6 backdrop-blur-sm">
                   <div class="mb-4 flex items-center justify-between">
-                    <h3 class="text-xs font-bold uppercase tracking-widest text-black/40">
+                    <h3 class="text-xs font-bold tracking-widest text-black/40 uppercase">
                       Live Telemetry
                     </h3>
                     <div class="flex items-center gap-2">
-                       <span class="relative flex h-2 w-2">
-                         {isDataLive.value && (
-                           <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
-                         )}
-                         <span
-                           class={`relative inline-flex h-2 w-2 rounded-full ${
-                             isDataLive.value ? "bg-green-500" : "bg-black/20"
-                           }`}
-                         ></span>
-                       </span>
-                       <span
-                         class={`text-[10px] font-medium uppercase ${
-                           isDataLive.value ? "text-green-600" : "text-black/40"
-                         }`}
-                       >
-                         {isDataLive.value
-                           ? "Receiving Hardware Data"
-                           : "Hardware Idle"}
-                       </span>
-                     </div>
+                      <span class="relative flex h-2 w-2">
+                        {isDataLive.value && (
+                          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+                        )}
+                        <span
+                          class={`relative inline-flex h-2 w-2 rounded-full ${
+                            isDataLive.value ? "bg-green-500" : "bg-black/20"
+                          }`}
+                        ></span>
+                      </span>
+                      <span
+                        class={`text-[10px] font-medium uppercase ${
+                          isDataLive.value ? "text-green-600" : "text-black/40"
+                        }`}
+                      >
+                        {isDataLive.value
+                          ? "Receiving Hardware Data"
+                          : "Hardware Idle"}
+                      </span>
+                    </div>
                   </div>
 
                   <div class="grid grid-cols-3 gap-4">
@@ -210,7 +210,9 @@ export const ManageModal = component$<ManageModalProps>(
                       <div class="flex items-end gap-1">
                         <span
                           class={`text-2xl font-semibold tabular-nums ${
-                            twin.temperature > 50 ? "text-orange-500" : "text-black"
+                            twin.temperature > 50
+                              ? "text-orange-500"
+                              : "text-black"
                           }`}
                         >
                           {twin.temperature}°C
@@ -219,9 +221,13 @@ export const ManageModal = component$<ManageModalProps>(
                       <div class="h-1 w-full overflow-hidden rounded-full bg-black/10">
                         <div
                           class={`h-full transition-all duration-500 ${
-                            twin.temperature > 50 ? "bg-orange-500" : "bg-blue-500"
+                            twin.temperature > 50
+                              ? "bg-orange-500"
+                              : "bg-blue-500"
                           }`}
-                          style={{ width: `${Math.min(100, twin.temperature * 2)}%` }}
+                          style={{
+                            width: `${Math.min(100, twin.temperature * 2)}%`,
+                          }}
                         />
                       </div>
                     </div>
@@ -246,7 +252,9 @@ export const ManageModal = component$<ManageModalProps>(
                       <div class="h-1 w-full overflow-hidden rounded-full bg-black/10">
                         <div
                           class={`h-full transition-all duration-500 ${
-                            twin.battery_health < 20 ? "bg-red-500" : "bg-green-500"
+                            twin.battery_health < 20
+                              ? "bg-red-500"
+                              : "bg-green-500"
                           }`}
                           style={{ width: `${twin.battery_health}%` }}
                         />

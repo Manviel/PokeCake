@@ -28,7 +28,7 @@ export const TwinCard = component$<TwinCardProps>(
           </div>
           <div class="mt-2 flex items-center gap-2">
             <span class="flex h-2 w-2 rounded-full bg-[#34c759]"></span>
-            <span class="text-[10px] font-medium text-[#34c759] uppercase tracking-wider">
+            <span class="text-[10px] font-medium tracking-wider text-[#34c759] uppercase">
               Connected
             </span>
           </div>
