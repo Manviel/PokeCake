@@ -8,3 +8,4 @@ aio-pika
 python-socketio
 python-engineio
 bidict
+ruff

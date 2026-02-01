@@ -12,6 +12,7 @@ If you are using an AI agent (like Antigravity), you can trigger pre-defined wor
 `/.agent/workflows/`
 
 - **`/dev-local`**: Starts the entire stack (DB, API, Frontend) with hot-reload enabled.
+- **`/lint`**: Runs project-wide linting and formatting (Ruff for Backend, ESLint/Prettier for Frontend).
 
 ---
 

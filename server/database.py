@@ -1,8 +1,8 @@
 import os
-from motor.motor_asyncio import AsyncIOMotorClient
-from dotenv import load_dotenv
-
 from pathlib import Path
+
+from dotenv import load_dotenv
+from motor.motor_asyncio import AsyncIOMotorClient
 
 # Load .env from root directory
 env_path = Path(__file__).resolve().parent.parent / ".env"
@@ -24,6 +24,7 @@ MONGODB_URL = f"mongodb://{username}:{password}@{host}:27017/{DATABASE_NAME}?aut
 
 client = AsyncIOMotorClient(MONGODB_URL)
 db = client[DATABASE_NAME]
+
 
 async def get_database():
     return db

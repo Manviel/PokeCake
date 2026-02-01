@@ -1,10 +1,13 @@
 import uuid
-from pydantic import BaseModel, Field
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel, Field
+
 
 def generate_serial():
     return f"QX{uuid.uuid4().hex[:8].upper()}"
+
 
 class ProductTwinCreate(BaseModel):
     name: str = Field(default="iPhone 15 Pro")
@@ -17,6 +20,7 @@ class ProductTwinCreate(BaseModel):
     is_charging: bool = Field(default=False)
     last_synced: datetime = Field(default_factory=datetime.utcnow)
 
+
 class ProductTwinUpdate(BaseModel):
     name: Optional[str] = None
     os_version: Optional[str] = None
@@ -24,6 +28,7 @@ class ProductTwinUpdate(BaseModel):
     cpu_usage: Optional[int] = None
     temperature: Optional[float] = None
     is_charging: Optional[bool] = None
+
 
 class ProductTwin(BaseModel):
     id: str = Field(..., alias="_id")

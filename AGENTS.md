@@ -25,6 +25,7 @@ To maintain the high standard of the **Apple Digital Twin project**, all AI agen
 - **Frontend**: Qwik City + Tailwind (Layout) + Vanilla CSS (Apple styling tokens).
 - **Backend**: FastAPI + Socket.IO + Motor.
 - **Messaging**: RabbitMQ.
+- **Linting**: **Ruff** for Backend (formatting, linting, import sorting); **ESLint/Prettier** for Frontend.
 
 ## 📝 Commits & Documentation
 
