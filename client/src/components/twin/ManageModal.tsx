@@ -191,14 +191,12 @@ export const ManageModal = component$<ManageModalProps>(
                       <dt class="text-[10px] font-medium text-gray-600 uppercase">
                         CPU Load
                       </dt>
-                      <dd class="flex items-end gap-1">
-                        <span
-                          class={`text-2xl font-semibold tabular-nums ${
-                            twin.cpu_usage > 80 ? "text-red-500" : "text-black"
-                          }`}
-                        >
-                          {twin.cpu_usage}%
-                        </span>
+                      <dd
+                        class={`flex items-end gap-1 text-2xl font-semibold tabular-nums ${
+                          twin.cpu_usage > 80 ? "text-red-500" : "text-black"
+                        }`}
+                      >
+                        {twin.cpu_usage}%
                       </dd>
                       <div
                         class="h-1 w-full overflow-hidden rounded-full bg-black/10"
@@ -222,16 +220,14 @@ export const ManageModal = component$<ManageModalProps>(
                       <dt class="text-[10px] font-medium text-gray-600 uppercase">
                         Temperature
                       </dt>
-                      <dd class="flex items-end gap-1">
-                        <span
-                          class={`text-2xl font-semibold tabular-nums ${
-                            twin.temperature > 50
-                              ? "text-orange-500"
-                              : "text-black"
-                          }`}
-                        >
-                          {twin.temperature}°C
-                        </span>
+                      <dd
+                        class={`flex items-end gap-1 text-2xl font-semibold tabular-nums ${
+                          twin.temperature > 50
+                            ? "text-orange-500"
+                            : "text-black"
+                        }`}
+                      >
+                        {twin.temperature}°C
                       </dd>
                       <div
                         class="h-1 w-full overflow-hidden rounded-full bg-black/10"
@@ -266,10 +262,8 @@ export const ManageModal = component$<ManageModalProps>(
                           </span>
                         )}
                       </div>
-                      <dd class="flex items-end gap-1">
-                        <span class="text-2xl font-semibold tabular-nums">
-                          {twin.battery_health}%
-                        </span>
+                      <dd class="flex items-end gap-1 text-2xl font-semibold tabular-nums">
+                        {twin.battery_health}%
                       </dd>
                       <div
                         class="h-1 w-full overflow-hidden rounded-full bg-black/10"
