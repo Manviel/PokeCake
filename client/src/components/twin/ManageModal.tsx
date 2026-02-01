@@ -149,9 +149,15 @@ export const ManageModal = component$<ManageModalProps>(
                 />
 
                 {/* Real-time Telemetry Dashboard */}
-                <div class="mb-8 overflow-hidden rounded-2xl bg-black/5 p-6 backdrop-blur-sm">
+                <section
+                  class="mb-8 overflow-hidden rounded-2xl border border-gray-200/60 bg-gray-50 p-6"
+                  aria-labelledby="telemetry-heading"
+                >
                   <div class="mb-4 flex items-center justify-between">
-                    <h3 class="text-xs font-bold tracking-widest text-black/40 uppercase">
+                    <h3
+                      id="telemetry-heading"
+                      class="text-xs font-bold tracking-widest text-gray-600 uppercase"
+                    >
                       Live Telemetry
                     </h3>
                     <div class="flex items-center gap-2">
@@ -167,8 +173,10 @@ export const ManageModal = component$<ManageModalProps>(
                       </span>
                       <span
                         class={`text-[10px] font-medium uppercase ${
-                          isDataLive.value ? "text-green-600" : "text-black/40"
+                          isDataLive.value ? "text-green-700" : "text-gray-600"
                         }`}
+                        role="status"
+                        aria-live="polite"
                       >
                         {isDataLive.value
                           ? "Receiving Hardware Data"
@@ -177,13 +185,13 @@ export const ManageModal = component$<ManageModalProps>(
                     </div>
                   </div>
 
-                  <div class="grid grid-cols-3 gap-4">
+                  <dl class="grid grid-cols-3 gap-4">
                     {/* CPU Usage */}
                     <div class="flex flex-col gap-1">
-                      <span class="text-[10px] font-medium text-black/40 uppercase">
+                      <dt class="text-[10px] font-medium text-gray-600 uppercase">
                         CPU Load
-                      </span>
-                      <div class="flex items-end gap-1">
+                      </dt>
+                      <dd class="flex items-end gap-1">
                         <span
                           class={`text-2xl font-semibold tabular-nums ${
                             twin.cpu_usage > 80 ? "text-red-500" : "text-black"
@@ -191,8 +199,15 @@ export const ManageModal = component$<ManageModalProps>(
                         >
                           {twin.cpu_usage}%
                         </span>
-                      </div>
-                      <div class="h-1 w-full overflow-hidden rounded-full bg-black/10">
+                      </dd>
+                      <div
+                        class="h-1 w-full overflow-hidden rounded-full bg-black/10"
+                        role="progressbar"
+                        aria-valuenow={twin.cpu_usage}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-label="CPU usage"
+                      >
                         <div
                           class={`h-full transition-all duration-500 ${
                             twin.cpu_usage > 80 ? "bg-red-500" : "bg-black"
@@ -204,10 +219,10 @@ export const ManageModal = component$<ManageModalProps>(
 
                     {/* Temperature */}
                     <div class="flex flex-col gap-1">
-                      <span class="text-[10px] font-medium text-black/40 uppercase">
+                      <dt class="text-[10px] font-medium text-gray-600 uppercase">
                         Temperature
-                      </span>
-                      <div class="flex items-end gap-1">
+                      </dt>
+                      <dd class="flex items-end gap-1">
                         <span
                           class={`text-2xl font-semibold tabular-nums ${
                             twin.temperature > 50
@@ -217,8 +232,15 @@ export const ManageModal = component$<ManageModalProps>(
                         >
                           {twin.temperature}°C
                         </span>
-                      </div>
-                      <div class="h-1 w-full overflow-hidden rounded-full bg-black/10">
+                      </dd>
+                      <div
+                        class="h-1 w-full overflow-hidden rounded-full bg-black/10"
+                        role="progressbar"
+                        aria-valuenow={twin.temperature}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-label="Temperature"
+                      >
                         <div
                           class={`h-full transition-all duration-500 ${
                             twin.temperature > 50
@@ -235,21 +257,28 @@ export const ManageModal = component$<ManageModalProps>(
                     {/* Battery */}
                     <div class="flex flex-col gap-1">
                       <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-medium text-black/40 uppercase">
+                        <dt class="text-[10px] font-medium text-gray-600 uppercase">
                           Battery
-                        </span>
+                        </dt>
                         {twin.is_charging && (
-                          <span class="animate-pulse text-[10px] font-bold text-green-600">
+                          <span class="animate-pulse text-[10px] font-bold text-green-700">
                             ⚡
                           </span>
                         )}
                       </div>
-                      <div class="flex items-end gap-1">
+                      <dd class="flex items-end gap-1">
                         <span class="text-2xl font-semibold tabular-nums">
                           {twin.battery_health}%
                         </span>
-                      </div>
-                      <div class="h-1 w-full overflow-hidden rounded-full bg-black/10">
+                      </dd>
+                      <div
+                        class="h-1 w-full overflow-hidden rounded-full bg-black/10"
+                        role="progressbar"
+                        aria-valuenow={twin.battery_health}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-label="Battery health"
+                      >
                         <div
                           class={`h-full transition-all duration-500 ${
                             twin.battery_health < 20
@@ -260,8 +289,8 @@ export const ManageModal = component$<ManageModalProps>(
                         />
                       </div>
                     </div>
-                  </div>
-                </div>
+                  </dl>
+                </section>
 
                 <div class="space-y-4">
                   <ManageAction

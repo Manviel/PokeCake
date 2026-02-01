@@ -8,8 +8,7 @@ import { ManageModal } from "../components/twin/ManageModal";
 import { PlusIcon, Loader2Icon } from "lucide-qwik";
 import { Alert } from "../components/ui/alert/alert";
 import { useAlert } from "../hooks/useAlert";
-import { io } from "socket.io-client";
-import { getSocketUrl } from "../services/api";
+import { socketService } from "../services/socket";
 
 export const useTwinsLoader = routeLoader$(async () => {
   return await fetchTwins();
@@ -47,38 +46,31 @@ export default component$(() => {
   // Real-time updates via Socket.IO
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(({ cleanup }) => {
-    const socket = io(getSocketUrl(), {
-      transports: ["websocket"], // Force WebSocket to avoid polling issues
-    });
+    // Connect to the socket service
+    socketService.connect();
 
-    socket.on("connect", () => {
-      console.log("Connected to Real-time Twin Stream");
-    });
+    // Register callback for telemetry updates
+    socketService.onTelemetryUpdate((data) => {
+      // Update the specific twin in the local state
+      // We create a new array to ensure Qwik reactivity detects the change
+      const updatedTwins = twins.value.map((t) => {
+        if (t._id === data._id) {
+          const updated = { ...t, ...data };
 
-    socket.on(
-      "telemetry_update",
-      (data: Partial<ProductTwin> & { _id: string }) => {
-        // Update the specific twin in the local state
-        // We create a new array to ensure Qwik reactivity detects the change
-        const updatedTwins = twins.value.map((t) => {
-          if (t._id === data._id) {
-            const updated = { ...t, ...data };
-
-            // If this is the twin currently being managed/viewed, update the selection signal too
-            if (selectedTwin.value?._id === data._id) {
-              selectedTwin.value = updated;
-            }
-
-            return updated;
+          // If this is the twin currently being managed/viewed, update the selection signal too
+          if (selectedTwin.value?._id === data._id) {
+            selectedTwin.value = updated;
           }
-          return t;
-        });
-        twins.value = [...updatedTwins];
-      },
-    );
+
+          return updated;
+        }
+        return t;
+      });
+      twins.value = [...updatedTwins];
+    });
 
     cleanup(() => {
-      socket.disconnect();
+      socketService.disconnect();
     });
   });
 

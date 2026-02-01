@@ -12,8 +12,8 @@ export const ManageAction = component$<ManageActionProps>(
       ? "bg-red-50/50 border-red-100/40"
       : "bg-white/50 border-white/40";
 
-    const titleClasses = isDanger ? "text-red-600" : "text-apple-text";
-    const descClasses = isDanger ? "text-red-400" : "text-apple-text-secondary";
+    const titleClasses = isDanger ? "text-red-700" : "text-apple-text";
+    const descClasses = isDanger ? "text-red-700" : "text-apple-text-secondary";
 
     return (
       <div
@@ -24,7 +24,7 @@ export const ManageAction = component$<ManageActionProps>(
       >
         <div>
           <p class={["font-semibold", titleClasses]}>{title}</p>
-          <p class={["text-xs", descClasses]}>{description}</p>
+          <p class={["text-sm", descClasses]}>{description}</p>
         </div>
         <div class="flex shrink-0 items-center">
           <Slot name="action" />

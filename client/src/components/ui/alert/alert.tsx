@@ -23,8 +23,8 @@ export const Alert = component$<AlertProps>(
     if (!show.value) return null;
 
     const bgColors = {
-      success: "bg-[#34c759] text-white",
-      error: "bg-[#ff3b30] text-white",
+      success: "bg-green-700 text-white",
+      error: "bg-red-600 text-white",
       info: "bg-apple-accent text-white",
     };
 
