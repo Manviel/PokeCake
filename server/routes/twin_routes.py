@@ -81,12 +81,10 @@ async def run_diagnostics(twin_id: str, db=Depends(get_database)):
     if not ObjectId.is_valid(twin_id):
         raise HTTPException(status_code=400, detail="Invalid ID format")
 
-    # Verify existence
     twin = await db.twins.find_one({"_id": ObjectId(twin_id)})
     if not twin:
         raise HTTPException(status_code=404, detail="Twin not found")
 
-    # Send command to RabbitMQ to trigger intensive simulation on the "physical" device
     await publish_command(
         {
             "target_serial": twin["serial_number"],
