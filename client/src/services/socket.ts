@@ -13,7 +13,7 @@ export type TelemetryUpdateCallback = (
 
 export class SocketService {
   private socket: Socket | null = null;
-  private telemetryCallback: TelemetryUpdateCallback | null = null;
+  private telemetryCallbacks: TelemetryUpdateCallback[] = [];
 
   /**
    * Initialize and connect to the Socket.IO server
@@ -37,9 +37,7 @@ export class SocketService {
     });
 
     this.socket.on("telemetry_update", (data) => {
-      if (this.telemetryCallback) {
-        this.telemetryCallback(data);
-      }
+      this.telemetryCallbacks.forEach((callback) => callback(data));
     });
   }
 
@@ -47,7 +45,18 @@ export class SocketService {
    * Register a callback for telemetry updates
    */
   onTelemetryUpdate(callback: TelemetryUpdateCallback): void {
-    this.telemetryCallback = callback;
+    if (!this.telemetryCallbacks.includes(callback)) {
+      this.telemetryCallbacks.push(callback);
+    }
+  }
+
+  /**
+   * Unregister a callback for telemetry updates
+   */
+  offTelemetryUpdate(callback: TelemetryUpdateCallback): void {
+    this.telemetryCallbacks = this.telemetryCallbacks.filter(
+      (cb) => cb !== callback,
+    );
   }
 
   /**
@@ -57,7 +66,7 @@ export class SocketService {
     if (this.socket) {
       this.socket.disconnect();
       this.socket = null;
-      this.telemetryCallback = null;
+      this.telemetryCallbacks = [];
     }
   }
 

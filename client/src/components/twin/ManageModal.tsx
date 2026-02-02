@@ -44,7 +44,6 @@ export const ManageModal = component$<ManageModalProps>(
     const showUnpairConfirm = useSignal(false);
     const isDataLive = useSignal(false);
 
-    // Data stream liveness detection
     useTask$(({ track, cleanup }) => {
       track(() => twin?.last_synced);
       if (twin) {
@@ -61,17 +60,14 @@ export const ManageModal = component$<ManageModalProps>(
       isUpdating.value = true;
 
       try {
-        // Stage 1: Checking
         updateStatus.value = "Checking...";
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
         const nextVersion = getNextVersion(twin.os_version);
 
-        // Stage 2: Downloading
         updateStatus.value = "Downloading...";
         await new Promise((resolve) => setTimeout(resolve, 1500));
 
-        // Stage 3: Installing
         updateStatus.value = "Installing...";
         await new Promise((resolve) => setTimeout(resolve, 1500));
 

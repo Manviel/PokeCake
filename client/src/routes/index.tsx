@@ -1,4 +1,10 @@
-import { component$, useSignal, $, useVisibleTask$ } from "@builder.io/qwik";
+import {
+  component$,
+  useSignal,
+  $,
+  useOnWindow,
+  useOnDocument,
+} from "@builder.io/qwik";
 import { routeLoader$, type DocumentHead } from "@builder.io/qwik-city";
 import { Button } from "../components/ui/button/button";
 import { fetchTwins, pairNewDevice, type ProductTwin } from "../services/api";
@@ -31,7 +37,6 @@ export default component$(() => {
     notify,
   } = useAlert();
 
-  // Core Data Fetching
   const loadTwins = $(async () => {
     isLoading.value = true;
     try {
@@ -43,38 +48,40 @@ export default component$(() => {
     }
   });
 
-  // Real-time updates via Socket.IO
-  // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(({ cleanup }) => {
-    // Connect to the socket service
-    socketService.connect();
+  useOnWindow(
+    "load",
+    $(() => {
+      socketService.connect();
 
-    // Register callback for telemetry updates
-    socketService.onTelemetryUpdate((data) => {
-      // Update the specific twin in the local state
-      // We create a new array to ensure Qwik reactivity detects the change
-      const updatedTwins = twins.value.map((t) => {
-        if (t._id === data._id) {
-          const updated = { ...t, ...data };
+      socketService.onTelemetryUpdate((data) => {
+        const currentSelectedTwin = selectedTwin.value;
 
-          // If this is the twin currently being managed/viewed, update the selection signal too
-          if (selectedTwin.value?._id === data._id) {
-            selectedTwin.value = updated;
+        const updatedTwins = twins.value.map((t) => {
+          if (t._id === data._id) {
+            const updated = { ...t, ...data };
+
+            if (currentSelectedTwin?._id === data._id) {
+              selectedTwin.value = updated;
+            }
+
+            return updated;
           }
-
-          return updated;
-        }
-        return t;
+          return t;
+        });
+        twins.value = [...updatedTwins];
       });
-      twins.value = [...updatedTwins];
-    });
+    }),
+  );
 
-    cleanup(() => {
-      socketService.disconnect();
-    });
-  });
+  useOnDocument(
+    "qvisible",
+    $(() => {
+      return () => {
+        socketService.disconnect();
+      };
+    }),
+  );
 
-  // Handlers
   const handleOpenSpecs = $((twin: ProductTwin) => {
     selectedTwin.value = twin;
     showSpecs.value = true;
@@ -92,7 +99,6 @@ export default component$(() => {
       if (freshTwin && selectedTwin.value?._id === updatedTwinId) {
         selectedTwin.value = freshTwin;
       } else if (!freshTwin) {
-        // If the twin is gone, it was likely unpaired/deleted
         notify("Device unpaired and removed successfully.", "success");
       }
     }
@@ -100,7 +106,6 @@ export default component$(() => {
 
   const handlePairDevice = $(async () => {
     isPairing.value = true;
-    // Simulate scanning delay for UX
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     try {

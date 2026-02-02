@@ -13,13 +13,10 @@ export interface ProductTwin {
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") {
-    // Browser
     return import.meta.env.VITE_API_URL + "/api/v1";
   }
 
-  // Server (SSR)
-  // When running locally, localhost works.
-  // When running in Docker, we set VITE_INTERNAL_API_URL to 'http://api:8000'
+  // When running in Docker, VITE_INTERNAL_API_URL = 'http://api:8000'
   return import.meta.env.VITE_INTERNAL_API_URL + "/api/v1";
 };
 
@@ -71,8 +68,6 @@ export const updateTwinOs = async (
 };
 
 export const pairNewDevice = async (): Promise<void> => {
-  // Let the API handle the generation of serials, model identifiers, etc.
-  // This follows real business logic where the server registers the hardware.
   const response = await fetch(`${API_BASE}/twins`, {
     method: "POST",
     headers: {
