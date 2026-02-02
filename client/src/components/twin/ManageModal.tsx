@@ -172,7 +172,7 @@ export const ManageModal = component$<ManageModalProps>(
                         ></span>
                       </span>
                       <span
-                        class={`text-[10px] font-medium uppercase ${
+                        class={`text-xs font-medium uppercase ${
                           isDataLive.value ? "text-green-700" : "text-gray-600"
                         }`}
                         role="status"
@@ -188,7 +188,7 @@ export const ManageModal = component$<ManageModalProps>(
                   <dl class="grid grid-cols-3 gap-4">
                     {/* CPU Usage */}
                     <div class="flex flex-col gap-1">
-                      <dt class="text-[10px] font-medium text-gray-600 uppercase">
+                      <dt class="text-xs font-medium text-gray-600 uppercase">
                         CPU Load
                       </dt>
                       <dd
@@ -217,7 +217,7 @@ export const ManageModal = component$<ManageModalProps>(
 
                     {/* Temperature */}
                     <div class="flex flex-col gap-1">
-                      <dt class="text-[10px] font-medium text-gray-600 uppercase">
+                      <dt class="text-xs font-medium text-gray-600 uppercase">
                         Temperature
                       </dt>
                       <dd
@@ -253,11 +253,11 @@ export const ManageModal = component$<ManageModalProps>(
                     {/* Battery */}
                     <div class="flex flex-col gap-1">
                       <div class="flex items-center justify-between">
-                        <dt class="text-[10px] font-medium text-gray-600 uppercase">
+                        <dt class="text-xs font-medium text-gray-600 uppercase">
                           Battery
                         </dt>
                         {twin.is_charging && (
-                          <span class="animate-pulse text-[10px] font-bold text-green-700">
+                          <span class="animate-pulse text-xs font-bold text-green-700">
                             ⚡
                           </span>
                         )}

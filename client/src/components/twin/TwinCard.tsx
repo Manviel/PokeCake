@@ -22,7 +22,7 @@ export const TwinCard = component$<TwinCardProps>(
           <dd class="text-right font-medium">{twin.os_version}</dd>
 
           <dt class="text-apple-text-secondary">Serial</dt>
-          <dd class="text-right font-mono text-[10px]">{twin.serial_number}</dd>
+          <dd class="text-right font-mono">{twin.serial_number}</dd>
 
           <dt class="sr-only">Connection Status</dt>
           <dd class="col-span-2 mt-2 flex items-center gap-2">
@@ -31,7 +31,7 @@ export const TwinCard = component$<TwinCardProps>(
               aria-hidden="true"
             ></span>
             <span
-              class="text-[10px] font-semibold tracking-wider text-green-700 uppercase"
+              class="font-semibold tracking-wider text-green-700 uppercase"
               role="status"
               aria-label="Device status: connected"
             >
