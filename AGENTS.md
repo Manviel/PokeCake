@@ -20,6 +20,14 @@ To maintain the high standard of the **Apple Digital Twin project**, all AI agen
 - **Telemetry**: Sent via `telemetry_updates` queue. Frequency should balance "live feel" with server load (0.5Hz suggested).
 - **Commands**: Sent via `device_commands` queue. Format: `{"target_serial": str, "action": str}`.
 
+## 🔐 Performance & Reliability
+
+- **Graceful Shutdown**: Always track background tasks in a `set()` and implement shutdown handlers to cancel them and close all shared connections (MongoDB, RabbitMQ).
+- **Memory Management**: Periodically reconcile in-memory state (like simulators) with the database to prune deleted or stale entries.
+- **Concurrency Safety**: Use `asyncio.Lock()` to protect shared resources, especially global connection pools, from race conditions.
+- **Concise Code**: Avoid useless or obvious comments. Code should be self-documenting.
+- **Imports**: Keep all module-level imports at the top of the file to strictly adhere to Ruff (E402).
+
 ## 🛠️ Tech Stack Enforcement
 
 - **Frontend**: Qwik City + Tailwind (Layout) + Vanilla CSS (Apple styling tokens).
