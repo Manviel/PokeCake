@@ -9,3 +9,6 @@ python-socketio
 python-engineio
 bidict
 ruff
+pandas
+scikit-learn
+numpy

@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import client
-from routes import twin_routes
+from routes import twin_routes, analytics
 from services.rabbitmq import _connection, consume_telemetry
 from simulation.device_sim import run_simulation
 from sio_instance import sio
@@ -57,6 +57,7 @@ api.add_middleware(
 )
 
 api.include_router(twin_routes.router, prefix="/api/v1", tags=["Digital Twins"])
+api.include_router(analytics.router, prefix="/api/v1/analytics", tags=["Analytics"])
 
 
 @api.get("/")

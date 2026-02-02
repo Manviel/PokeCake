@@ -105,3 +105,21 @@ export const runDiagnostics = async (
   }
   return response.json();
 };
+
+export const fetchHistory = async (serial: string) => {
+  const response = await fetch(`${API_BASE}/analytics/${serial}/history`);
+  if (!response.ok) throw new Error("Failed to fetch history");
+  return response.json();
+};
+
+export const fetchForecast = async (serial: string) => {
+  const response = await fetch(`${API_BASE}/analytics/${serial}/forecast`);
+  if (!response.ok) throw new Error("Failed to fetch forecast");
+  return response.json();
+};
+
+export const fetchAnomalies = async (serial: string) => {
+  const response = await fetch(`${API_BASE}/analytics/${serial}/anomalies`);
+  if (!response.ok) throw new Error("Failed to fetch anomalies");
+  return response.json();
+};

@@ -5,9 +5,7 @@ export default component$(() => {
   return (
     <>
       <Header />
-      <main class="container pt-[50px]">
-        <Slot />
-      </main>
+      <Slot />
       <footer class="text-apple-text-secondary p-16 text-center text-xs">
         Copyright © {new Date().getFullYear()} Apple Digital Twin Inc. All
         rights reserved.

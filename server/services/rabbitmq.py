@@ -75,6 +75,13 @@ async def process_message(message: aio_pika.IncomingMessage, sio=None):
                 await db.twins.update_one(
                     {"serial_number": serial_number}, {"$set": update_data}
                 )
+                
+                # Persist history for analytics
+                history_entry = {
+                    "serial_number": serial_number,
+                    **update_data
+                }
+                await db.telemetry_history.insert_one(history_entry)
 
                 if sio:
                     twin = await db.twins.find_one(

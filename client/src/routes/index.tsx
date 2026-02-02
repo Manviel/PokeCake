@@ -121,7 +121,7 @@ export default component$(() => {
   });
 
   return (
-    <div class="relative mt-8">
+    <main class="relative container mt-8 pt-[50px]">
       <div class="pointer-events-none absolute top-0 right-0 left-0 z-50 flex justify-center">
         <div class="pointer-events-auto w-full max-w-md">
           <Alert
@@ -208,7 +208,7 @@ export default component$(() => {
         twin={selectedTwin.value}
         onUpdate$={handleTwinUpdate}
       />
-    </div>
+    </main>
   );
 });
 

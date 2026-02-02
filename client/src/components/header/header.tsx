@@ -8,6 +8,9 @@ export const Header = component$(() => {
           <a href="/" class="hover:text-apple-text transition-colors">
             Dashboard
           </a>
+          <a href="/analytics" class="hover:text-apple-text transition-colors">
+            Analytics
+          </a>
         </nav>
       </div>
     </header>
