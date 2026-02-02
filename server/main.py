@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import client
-from routes import twin_routes, analytics
+from routes import analytics, twin_routes
 from services.rabbitmq import _connection, consume_telemetry
 from simulation.device_sim import run_simulation
 from sio_instance import sio

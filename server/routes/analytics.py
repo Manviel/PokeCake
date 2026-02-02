@@ -1,7 +1,13 @@
 from fastapi import APIRouter, HTTPException
-from services.analytics import get_telemetry_history, train_model_and_forecast, detect_anomalies
+
+from services.analytics import (
+    detect_anomalies,
+    get_telemetry_history,
+    train_model_and_forecast,
+)
 
 router = APIRouter()
+
 
 @router.get("/{serial_number}/history")
 async def get_history(serial_number: str):
@@ -11,15 +17,16 @@ async def get_history(serial_number: str):
     history = await get_telemetry_history(serial_number)
     if not history:
         raise HTTPException(status_code=404, detail="No history found for this device")
-    
+
     # Convert ObjectIDs to strings if needed, though they shouldn't be in the simple list if not handled.
     # But usually mongo returns _id. Let's fix that in service or here.
     # Service returns list of dicts.
     for entry in history:
         if "_id" in entry:
             entry["_id"] = str(entry["_id"])
-            
+
     return history
+
 
 @router.get("/{serial_number}/forecast")
 async def get_forecast(serial_number: str):
@@ -30,6 +37,7 @@ async def get_forecast(serial_number: str):
     if "error" in prediction:
         raise HTTPException(status_code=400, detail=prediction["error"])
     return prediction
+
 
 @router.get("/{serial_number}/anomalies")
 async def get_anomalies(serial_number: str):
