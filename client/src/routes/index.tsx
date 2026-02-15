@@ -1,19 +1,19 @@
 import {
-  component$,
-  useSignal,
   $,
-  useOnWindow,
+  component$,
   useOnDocument,
+  useOnWindow,
+  useSignal,
 } from "@builder.io/qwik";
-import { routeLoader$, type DocumentHead } from "@builder.io/qwik-city";
-import { Button } from "../components/ui/button/button";
-import { fetchTwins, pairNewDevice, type ProductTwin } from "../services/api";
-import { TwinCard } from "../components/twin/TwinCard";
-import { SpecsModal } from "../components/twin/SpecsModal";
+import { type DocumentHead, routeLoader$ } from "@builder.io/qwik-city";
+import { Loader2Icon, PlusIcon } from "lucide-qwik";
 import { ManageModal } from "../components/twin/ManageModal";
-import { PlusIcon, Loader2Icon } from "lucide-qwik";
+import { SpecsModal } from "../components/twin/SpecsModal";
+import { TwinCard } from "../components/twin/TwinCard";
 import { Alert } from "../components/ui/alert/alert";
+import { Button } from "../components/ui/button/button";
 import { useAlert } from "../hooks/useAlert";
+import { fetchTwins, type ProductTwin, pairNewDevice } from "../services/api";
 import { socketService } from "../services/socket";
 
 export const useTwinsLoader = routeLoader$(async () => {
@@ -174,6 +174,7 @@ export default component$(() => {
 
               {/* Add New Device Card */}
               <button
+                type="button"
                 onClick$={handlePairDevice}
                 disabled={isPairing.value}
                 class="bg-apple-card border-apple-border group glass flex min-h-[300px] flex-col items-center justify-center rounded-[18px] border border-dashed p-6 transition-colors hover:bg-black/5"

@@ -11,15 +11,6 @@ export interface ProductTwin {
   last_synced: string;
 }
 
-const getBaseUrl = () => {
-  if (typeof window !== "undefined") {
-    return import.meta.env.VITE_API_URL + "/api/v1";
-  }
-
-  // When running in Docker, VITE_INTERNAL_API_URL = 'http://api:8000'
-  return import.meta.env.VITE_INTERNAL_API_URL + "/api/v1";
-};
-
 export const getSocketUrl = () => {
   if (typeof window !== "undefined") {
     return import.meta.env.VITE_API_URL || "http://localhost:8000";
@@ -27,7 +18,10 @@ export const getSocketUrl = () => {
   return "http://localhost:8000";
 };
 
-const API_BASE = getBaseUrl();
+const API_BASE =
+  typeof window !== "undefined"
+    ? `${import.meta.env.VITE_API_URL}/api/v1`
+    : `${import.meta.env.VITE_INTERNAL_API_URL}/api/v1`;
 
 export const fetchTwins = async (): Promise<ProductTwin[]> => {
   const response = await fetch(`${API_BASE}/twins`);

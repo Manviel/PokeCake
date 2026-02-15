@@ -1,25 +1,25 @@
 import {
-  component$,
-  useSignal,
-  useTask$,
   $,
+  component$,
   type PropFunction,
   type Signal,
+  useSignal,
+  useTask$,
 } from "@builder.io/qwik";
-import { Button } from "../ui/button/button";
-import { Modal } from "../ui/modal/modal";
+import { Loader2Icon, XIcon } from "lucide-qwik";
+import { useAlert } from "../../hooks/useAlert";
 import {
   type ProductTwin,
-  updateTwinOs,
   runDiagnostics,
   unpairDevice,
+  updateTwinOs,
 } from "../../services/api";
-import { Alert } from "../ui/alert/alert";
-import { ConfirmDialog } from "../ui/dialog/confirm-dialog";
-import { useAlert } from "../../hooks/useAlert";
-import { ManageAction } from "./ManageAction";
 import { getNextVersion } from "../../utils/version";
-import { XIcon, Loader2Icon } from "lucide-qwik";
+import { Alert } from "../ui/alert/alert";
+import { Button } from "../ui/button/button";
+import { ConfirmDialog } from "../ui/dialog/confirm-dialog";
+import { Modal } from "../ui/modal/modal";
+import { ManageAction } from "./ManageAction";
 
 interface ManageModalProps {
   show: Signal<boolean>;
@@ -131,6 +131,7 @@ export const ManageModal = component$<ManageModalProps>(
                     </Modal.Description>
                   </div>
                   <button
+                    type="button"
                     onClick$={() => (show.value = false)}
                     class="flex h-8 w-8 items-center justify-center rounded-full bg-black/5 transition-colors hover:bg-black/10"
                   >
@@ -167,17 +168,16 @@ export const ManageModal = component$<ManageModalProps>(
                           }`}
                         ></span>
                       </span>
-                      <span
+                      <output
                         class={`text-xs font-medium uppercase ${
                           isDataLive.value ? "text-green-700" : "text-gray-600"
                         }`}
-                        role="status"
                         aria-live="polite"
                       >
                         {isDataLive.value
                           ? "Receiving Hardware Data"
                           : "Hardware Idle"}
-                      </span>
+                      </output>
                     </div>
                   </div>
 

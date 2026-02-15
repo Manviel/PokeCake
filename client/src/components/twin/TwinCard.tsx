@@ -1,6 +1,6 @@
 import { component$, type PropFunction } from "@builder.io/qwik";
-import { Button } from "../ui/button/button";
 import type { ProductTwin } from "../../services/api";
+import { Button } from "../ui/button/button";
 
 interface TwinCardProps {
   twin: ProductTwin;
@@ -30,13 +30,12 @@ export const TwinCard = component$<TwinCardProps>(
               class="flex h-2 w-2 rounded-full bg-green-700"
               aria-hidden="true"
             ></span>
-            <span
+            <output
               class="font-semibold tracking-wider text-green-700 uppercase"
-              role="status"
               aria-label="Device status: connected"
             >
               Connected
-            </span>
+            </output>
           </dd>
         </dl>
 
