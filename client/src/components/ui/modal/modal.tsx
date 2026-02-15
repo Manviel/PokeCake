@@ -1,4 +1,4 @@
-import { component$, Slot, type Signal } from "@builder.io/qwik";
+import { component$, type Signal, Slot } from "@builder.io/qwik";
 import { Modal as HeadlessModal } from "@qwik-ui/headless";
 
 export const Modal = {

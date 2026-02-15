@@ -1,5 +1,5 @@
 import { component$, type Signal, useTask$ } from "@builder.io/qwik";
-import { CheckIcon, AlertCircleIcon, InfoIcon } from "lucide-qwik";
+import { AlertCircleIcon, CheckIcon, InfoIcon } from "lucide-qwik";
 
 export interface AlertProps {
   show: Signal<boolean>;

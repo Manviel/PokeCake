@@ -1,4 +1,4 @@
-import { useSignal, $, type Signal } from "@builder.io/qwik";
+import { $, type Signal, useSignal } from "@builder.io/qwik";
 
 export type AlertType = "success" | "error" | "info";
 

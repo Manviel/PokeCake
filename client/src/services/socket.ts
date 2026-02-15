@@ -1,6 +1,6 @@
-import { io, Socket } from "socket.io-client";
-import { getSocketUrl } from "./api";
+import { io, type Socket } from "socket.io-client";
 import type { ProductTwin } from "./api";
+import { getSocketUrl } from "./api";
 
 /**
  * Socket.IO service for real-time telemetry updates
@@ -37,7 +37,9 @@ export class SocketService {
     });
 
     this.socket.on("telemetry_update", (data) => {
-      this.telemetryCallbacks.forEach((callback) => callback(data));
+      this.telemetryCallbacks.forEach((callback) => {
+        callback(data);
+      });
     });
   }
 

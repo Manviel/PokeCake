@@ -1,0 +1,28 @@
+{
+    "vcs": {
+        "enabled": false,
+        "clientKind": "git",
+        "useIgnoreFile": true
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "recommended": true,
+            "suspicious": {
+                "noExplicitAny": "error"
+            }
+        }
+    },
+    "formatter": {
+        "enabled": true,
+        "indentStyle": "space",
+        "indentWidth": 2
+    },
+    "css": {
+        "parser": {
+            "cssModules": true,
+            "allowWrongLineComments": false,
+            "tailwindDirectives": true
+        }
+    }
+}

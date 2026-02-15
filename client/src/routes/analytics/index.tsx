@@ -1,13 +1,13 @@
 import { component$, useStore, useTask$ } from "@builder.io/qwik";
-import { Select } from "@qwik-ui/headless";
-import { ChevronDownIcon, CheckIcon } from "lucide-qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
+import { Select } from "@qwik-ui/headless";
+import { CheckIcon, ChevronDownIcon } from "lucide-qwik";
 import { TelemetryChart } from "~/components/analytics/TelemetryChart";
 import {
-  fetchTwins,
-  fetchHistory,
-  fetchForecast,
   fetchAnomalies,
+  fetchForecast,
+  fetchHistory,
+  fetchTwins,
 } from "~/services/api";
 
 export const useAnalyticsTwins = routeLoader$(async () => {
@@ -20,10 +20,28 @@ export const useAnalyticsTwins = routeLoader$(async () => {
   }
 });
 
+interface HistoryItem {
+  last_synced: string;
+  temperature: number;
+  cpu_usage: number;
+}
+
+interface Forecast {
+  current_temperature: number;
+  forecast_temperature: number;
+  trend: string;
+}
+
+interface Anomaly {
+  timestamp: string;
+  type: string;
+  temperature: number;
+}
+
 interface AnalyticsData {
-  history: any[];
-  forecast: any;
-  anomalies: any[];
+  history: HistoryItem[];
+  forecast: Forecast | null;
+  anomalies: Anomaly[];
   loading: boolean;
   selectedTwin: string | null;
 }

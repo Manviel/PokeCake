@@ -1,4 +1,4 @@
-import { component$, Slot, type PropsOf } from "@builder.io/qwik";
+import { component$, type PropsOf, Slot } from "@builder.io/qwik";
 import { cva, type VariantProps } from "class-variance-authority";
 
 export const buttonVariants = cva(

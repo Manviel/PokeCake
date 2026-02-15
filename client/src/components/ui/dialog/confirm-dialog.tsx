@@ -1,6 +1,6 @@
-import { component$, type Signal, type PropFunction } from "@builder.io/qwik";
-import { Modal } from "../modal/modal";
+import { component$, type PropFunction, type Signal } from "@builder.io/qwik";
 import { Button } from "../button/button";
+import { Modal } from "../modal/modal";
 
 interface ConfirmDialogProps {
   show: Signal<boolean>;
