@@ -6,11 +6,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import client
-from routes import analytics, twin_routes
+from routes import analytics, sales, twin_routes
+from services.analytics_scheduler import analytics_scheduler_loop
+from services.analytics_worker import AnalyticsWorker
 from services.rabbitmq import _connection, consume_telemetry
 from simulation.device_sim import run_simulation
-from services.analytics_worker import AnalyticsWorker
-from services.analytics_scheduler import analytics_scheduler_loop
 from sio_instance import sio
 
 api = FastAPI(
@@ -29,7 +29,7 @@ async def startup_event():
     print("⚡ PokeCake API with Socket.IO initialized ⚡")
     telemetry_task = asyncio.create_task(consume_telemetry(sio))
     simulation_task = asyncio.create_task(run_simulation())
-    
+
     # Analytics Tasks
     analytics_worker = AnalyticsWorker()
     worker_task = asyncio.create_task(analytics_worker.run())
@@ -71,6 +71,7 @@ api.add_middleware(
 
 api.include_router(twin_routes.router, prefix="/api/v1", tags=["Digital Twins"])
 api.include_router(analytics.router, prefix="/api/v1/analytics", tags=["Analytics"])
+api.include_router(sales.router, prefix="/api/v1/sales", tags=["Sales"])
 
 
 @api.get("/")

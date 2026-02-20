@@ -1,28 +1,56 @@
 import { component$, useStore, useTask$ } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { Select } from "@qwik-ui/headless";
-import { CheckIcon, ChevronDownIcon, ActivityIcon, TrendingUpIcon, TrendingDownIcon, MinusIcon } from "lucide-qwik";
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  ActivityIcon,
+  TrendingUpIcon,
+  TrendingDownIcon,
+  MinusIcon,
+  DollarSignIcon,
+  ShieldAlertIcon,
+  CalendarIcon,
+} from "lucide-qwik";
 import { TelemetryChart } from "~/components/analytics/TelemetryChart";
+import { SalesSummaryCard } from "~/components/analytics/SalesSummaryCard";
 import {
   fetchAnomalies,
   fetchForecast,
   fetchHistory,
   fetchTwins,
   fetchDeviceAnalytics,
+  fetchSalesSummary,
   type DeviceAnalytics,
   type Anomaly,
   type HistoryItem,
   type Forecast,
+  type SalesSummary,
   UsageTrend,
 } from "~/services/api";
 
 export const useAnalyticsTwins = routeLoader$(async () => {
   try {
-    const twins = await fetchTwins();
-    return twins;
+    return await fetchTwins();
   } catch (e) {
     console.error("Failed to load twins for analytics", e);
     return [];
+  }
+});
+
+export const useSalesSummary = routeLoader$(async () => {
+  try {
+    return await fetchSalesSummary();
+  } catch (e) {
+    console.error("Failed to load sales summary", e);
+    return {
+      total_revenue: 0,
+      total_units_sold: 0,
+      total_revenue_at_risk: 0,
+      devices_at_risk: 0,
+      by_region: [],
+      by_channel: [],
+    } as SalesSummary;
   }
 });
 
@@ -37,6 +65,8 @@ interface AnalyticsData {
 
 export default component$(() => {
   const twinsLoader = useAnalyticsTwins();
+  const salesSummaryLoader = useSalesSummary();
+
   const state = useStore<AnalyticsData>({
     history: [],
     forecast: null,
@@ -47,10 +77,8 @@ export default component$(() => {
       twinsLoader.value.length > 0 ? twinsLoader.value[0].serial_number : null,
   });
 
-  // Fetch analytics when selected twin changes
   useTask$(async ({ track }) => {
     track(() => state.selectedTwin);
-
     if (!state.selectedTwin) return;
 
     state.loading = true;
@@ -79,11 +107,14 @@ export default component$(() => {
   const temps = state.history.map((h) => h.temperature);
   const cpu = state.history.map((h) => h.cpu_usage);
 
+  const da = state.deviceAnalytics;
+
   return (
     <main class="min-h-screen bg-slate-950 p-8 pt-[80px] text-slate-50">
       <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] bg-[size:14px_24px]"></div>
 
       <div class="relative z-10 mx-auto max-w-7xl space-y-8">
+        {/* Header + device selector */}
         <header class="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-900/80 p-6 shadow-2xl backdrop-blur-xl">
           <div>
             <h1 class="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-600 bg-clip-text text-4xl font-bold text-transparent">
@@ -132,6 +163,9 @@ export default component$(() => {
           )}
         </header>
 
+        {/* ── Fleet Sales Summary ── */}
+        <SalesSummaryCard summary={salesSummaryLoader.value} />
+
         {state.loading && !state.history.length && state.selectedTwin && (
           <div class="flex animate-pulse justify-center space-x-4 p-12">
             <div class="text-xl text-slate-500">Initializing AI Models...</div>
@@ -140,64 +174,148 @@ export default component$(() => {
 
         {!state.loading && state.selectedTwin && (
           <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            {/* Health & Trend Card */}
+            {/* KPI Row — 5 cards */}
             <div class="col-span-1 lg:col-span-2">
-               <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Health Score */}
-                  <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md">
-                      <div class="flex items-center gap-3 mb-2">
-                          <div class="p-2 rounded-full bg-emerald-500/20 text-emerald-400">
-                              <ActivityIcon class="w-6 h-6" />
-                          </div>
-                          <h3 class="text-lg font-medium text-slate-200">System Health</h3>
-                      </div>
-                      <div class="flex items-end gap-2">
-                          <span class="text-5xl font-bold text-white">{state.deviceAnalytics?.health_score ?? "--"}</span>
-                          <span class="text-lg text-slate-400 mb-1">/ 100</span>
-                      </div>
-                      <div class="mt-3 h-2 w-full rounded-full bg-white/5 overflow-hidden">
-                          <div class="h-full bg-gradient-to-r from-emerald-500 to-emerald-300 transition-all duration-1000" style={{ width: `${state.deviceAnalytics?.health_score ?? 0}%` }}></div>
-                      </div>
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-5">
+                {/* Health Score */}
+                <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md">
+                  <div class="mb-2 flex items-center gap-3">
+                    <div class="rounded-full bg-emerald-500/20 p-2 text-emerald-400">
+                      <ActivityIcon class="h-6 w-6" />
+                    </div>
+                    <h3 class="text-lg font-medium text-slate-200">
+                      System Health
+                    </h3>
                   </div>
+                  <div class="flex items-end gap-2">
+                    <span class="text-5xl font-bold text-white">
+                      {da?.health_score ?? "--"}
+                    </span>
+                    <span class="mb-1 text-lg text-slate-400">/ 100</span>
+                  </div>
+                  <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/5">
+                    <div
+                      class="h-full bg-gradient-to-r from-emerald-500 to-emerald-300 transition-all duration-1000"
+                      style={{ width: `${da?.health_score ?? 0}%` }}
+                    ></div>
+                  </div>
+                </div>
 
-                  {/* Usage Trend */}
-                  <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md">
-                      <div class="flex items-center gap-3 mb-2">
-                          <div class="p-2 rounded-full bg-blue-500/20 text-blue-400">
-                              <TrendingUpIcon class="w-6 h-6" />
-                          </div>
-                          <h3 class="text-lg font-medium text-slate-200">Usage Trend</h3>
-                      </div>
-                      <div class="flex items-center gap-4 mt-2">
-                          {state.deviceAnalytics?.usage_trend === UsageTrend.INCREASING && (
-                              <TrendingUpIcon class="w-12 h-12 text-red-400" />
-                          )}
-                          {state.deviceAnalytics?.usage_trend === UsageTrend.DECREASING && (
-                              <TrendingDownIcon class="w-12 h-12 text-emerald-400" />
-                          )}
-                          {state.deviceAnalytics?.usage_trend === UsageTrend.STABLE && (
-                              <MinusIcon class="w-12 h-12 text-slate-400" />
-                          )}
-                          <div>
-                              <div class="text-2xl font-bold text-white capitalize">{state.deviceAnalytics?.usage_trend}</div>
-                              <div class="text-sm text-slate-400">Based on recent load</div>
-                          </div>
-                      </div>
+                {/* Usage Trend */}
+                <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md">
+                  <div class="mb-2 flex items-center gap-3">
+                    <div class="rounded-full bg-blue-500/20 p-2 text-blue-400">
+                      <TrendingUpIcon class="h-6 w-6" />
+                    </div>
+                    <h3 class="text-lg font-medium text-slate-200">
+                      Usage Trend
+                    </h3>
                   </div>
+                  <div class="mt-2 flex items-center gap-4">
+                    {da?.usage_trend === UsageTrend.INCREASING && (
+                      <TrendingUpIcon class="h-12 w-12 text-red-400" />
+                    )}
+                    {da?.usage_trend === UsageTrend.DECREASING && (
+                      <TrendingDownIcon class="h-12 w-12 text-emerald-400" />
+                    )}
+                    {da?.usage_trend === UsageTrend.STABLE && (
+                      <MinusIcon class="h-12 w-12 text-slate-400" />
+                    )}
+                    <div>
+                      <div class="text-2xl font-bold text-white capitalize">
+                        {da?.usage_trend}
+                      </div>
+                      <div class="text-sm text-slate-400">
+                        Based on recent load
+                      </div>
+                    </div>
+                  </div>
+                  {da?.return_risk_flag && (
+                    <div class="mt-3 flex items-center gap-1.5 rounded-lg border border-red-500/30 bg-red-500/10 px-2 py-1 text-xs font-medium text-red-400">
+                      <ShieldAlertIcon class="h-3.5 w-3.5" />
+                      Return Risk Active
+                    </div>
+                  )}
+                </div>
 
-                  {/* Last Analyzed */}
-                  <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md">
-                       <h3 class="text-lg font-medium text-slate-200 mb-2">Last Analysis</h3>
-                       <div class="text-3xl font-bold text-white">
-                           {state.deviceAnalytics?.last_analyzed ? new Date(state.deviceAnalytics.last_analyzed).toLocaleTimeString() : "--:--"}
-                       </div>
-                       <div class="text-sm text-slate-400 mt-1">
-                           {state.deviceAnalytics?.last_analyzed ? new Date(state.deviceAnalytics.last_analyzed).toLocaleDateString() : ""}
-                       </div>
+                {/* Revenue at Risk */}
+                <div class="rounded-3xl border border-red-500/20 bg-gradient-to-br from-slate-900 to-red-950/20 p-6 shadow-lg backdrop-blur-md">
+                  <div class="mb-2 flex items-center gap-3">
+                    <div class="rounded-full bg-red-500/20 p-2 text-red-400">
+                      <DollarSignIcon class="h-6 w-6" />
+                    </div>
+                    <h3 class="text-lg font-medium text-slate-200">
+                      Revenue at Risk
+                    </h3>
                   </div>
-               </div>
+                  {da?.revenue_at_risk != null ? (
+                    <>
+                      <div class="text-4xl font-bold text-red-300">
+                        $
+                        {da.revenue_at_risk.toLocaleString("en-US", {
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 0,
+                        })}
+                      </div>
+                      <div class="mt-1 text-xs text-slate-500">
+                        based on health score
+                      </div>
+                    </>
+                  ) : (
+                    <div class="mt-4 text-sm text-slate-600">
+                      No sale record
+                    </div>
+                  )}
+                </div>
+
+                {/* Days Since Sale */}
+                <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md">
+                  <div class="mb-2 flex items-center gap-3">
+                    <div class="rounded-full bg-purple-500/20 p-2 text-purple-400">
+                      <CalendarIcon class="h-6 w-6" />
+                    </div>
+                    <h3 class="text-lg font-medium text-slate-200">
+                      Days Since Sale
+                    </h3>
+                  </div>
+                  {da?.days_since_sale != null ? (
+                    <>
+                      <div class="text-4xl font-bold text-white">
+                        {da.days_since_sale}
+                      </div>
+                      <div class="mt-1 text-xs text-slate-500">
+                        {da.days_since_sale < 365
+                          ? `${365 - da.days_since_sale}d left in warranty`
+                          : "Warranty expired"}
+                      </div>
+                    </>
+                  ) : (
+                    <div class="mt-4 text-sm text-slate-600">
+                      No sale record
+                    </div>
+                  )}
+                </div>
+
+                {/* Last Analyzed */}
+                <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md">
+                  <h3 class="mb-2 text-lg font-medium text-slate-200">
+                    Last Analysis
+                  </h3>
+                  <div class="text-3xl font-bold text-white">
+                    {da?.last_analyzed
+                      ? new Date(da.last_analyzed).toLocaleTimeString()
+                      : "--:--"}
+                  </div>
+                  <div class="mt-1 text-sm text-slate-400">
+                    {da?.last_analyzed
+                      ? new Date(da.last_analyzed).toLocaleDateString()
+                      : ""}
+                  </div>
+                </div>
+              </div>
             </div>
 
+            {/* Temperature Forecast chart */}
             <div class="space-y-4">
               <h2 class="flex items-center gap-2 text-xl font-semibold text-slate-200">
                 <span class="h-2 w-2 rounded-full bg-red-400 shadow-[0_0_10px_rgba(248,113,113,0.5)]"></span>
@@ -219,7 +337,6 @@ export default component$(() => {
                       Linear Regression
                     </div>
                   </div>
-
                   <div class="mt-6 grid grid-cols-2 gap-8">
                     <div>
                       <span class="mb-1 block text-sm font-medium tracking-wider text-slate-400 uppercase">
@@ -247,6 +364,7 @@ export default component$(() => {
               )}
             </div>
 
+            {/* CPU chart + Anomaly log */}
             <div class="space-y-4">
               <h2 class="flex items-center gap-2 text-xl font-semibold text-slate-200">
                 <span class="h-2 w-2 rounded-full bg-blue-400 shadow-[0_0_10px_rgba(56,189,248,0.5)]"></span>

@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -44,13 +44,37 @@ class ProductTwin(BaseModel):
         populate_by_name = True
 
 
+class SaleRecordCreate(BaseModel):
+    serial_number: str
+    price_usd: float = Field(..., gt=0, description="Sale price in USD")
+    region: Literal["US", "EU", "APAC", "LATAM", "OTHER"] = Field(default="US")
+    channel: Literal["online", "retail", "B2B"] = Field(default="online")
+    customer_segment: Literal["consumer", "enterprise", "education"] = Field(
+        default="consumer"
+    )
+    sold_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class SaleRecord(SaleRecordCreate):
+    id: str = Field(..., alias="_id")
+
+    class Config:
+        populate_by_name = True
+
+
 class DeviceAnalytics(BaseModel):
     serial_number: str
     last_analyzed: datetime = Field(default_factory=datetime.utcnow)
-    health_score: int = Field(..., ge=0, le=100, description="Overall device health score (0-100)")
+    health_score: int = Field(
+        ..., ge=0, le=100, description="Overall device health score (0-100)"
+    )
     predicted_failure_date: Optional[datetime] = None
     anomalies: list[dict] = Field(default_factory=list)
     usage_trend: str = Field(..., pattern="^(increasing|decreasing|stable)$")
+    # Sales-derived risk fields (None when no sale record exists)
+    revenue_at_risk: Optional[float] = None
+    return_risk_flag: Optional[bool] = None
+    days_since_sale: Optional[int] = None
 
     class Config:
         populate_by_name = True
