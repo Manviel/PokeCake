@@ -4,18 +4,15 @@ import {
   type PropFunction,
   type Signal,
   useSignal,
-  useStore,
   useTask$,
 } from "@builder.io/qwik";
-import { Loader2Icon, XIcon, TagIcon } from "lucide-qwik";
+import { Loader2Icon, XIcon } from "lucide-qwik";
 import { useAlert } from "../../hooks/useAlert";
 import {
   type ProductTwin,
-  type SaleRecord,
   runDiagnostics,
   unpairDevice,
   updateTwinOs,
-  recordSale,
 } from "../../services/api";
 import { getNextVersion } from "../../utils/version";
 import { Alert } from "../ui/alert/alert";
@@ -30,27 +27,11 @@ interface ManageModalProps {
   onUpdate$: PropFunction<(twinId: string) => void>;
 }
 
-interface SaleForm {
-  price_usd: string;
-  region: SaleRecord["region"];
-  channel: SaleRecord["channel"];
-  customer_segment: SaleRecord["customer_segment"];
-}
-
 export const ManageModal = component$<ManageModalProps>(
   ({ show, twin, onUpdate$ }) => {
     const isUpdating = useSignal(false);
     const isRunningDiagnostics = useSignal(false);
     const isUnpairing = useSignal(false);
-    const isRecordingSale = useSignal(false);
-    const showSaleForm = useSignal(false);
-
-    const saleForm = useStore<SaleForm>({
-      price_usd: "",
-      region: "US",
-      channel: "online",
-      customer_segment: "consumer",
-    });
 
     const {
       show: showAlert,
@@ -135,42 +116,6 @@ export const ManageModal = component$<ManageModalProps>(
         isUnpairing.value = false;
       }
     });
-
-    const handleRecordSale = $(async () => {
-      if (!twin) return;
-      const price = parseFloat(saleForm.price_usd);
-      if (isNaN(price) || price <= 0) {
-        notify("Please enter a valid price greater than 0.", "error");
-        return;
-      }
-
-      isRecordingSale.value = true;
-      try {
-        await recordSale({
-          serial_number: twin.serial_number,
-          price_usd: price,
-          region: saleForm.region,
-          channel: saleForm.channel,
-          customer_segment: saleForm.customer_segment,
-          sold_at: new Date().toISOString(),
-        });
-        notify(
-          `Sale recorded for ${twin.serial_number} — $${price.toFixed(2)}`,
-          "success",
-        );
-        showSaleForm.value = false;
-        saleForm.price_usd = "";
-      } catch (e) {
-        console.error(e);
-        notify("Failed to record sale.", "error");
-      } finally {
-        isRecordingSale.value = false;
-      }
-    });
-
-    const selectClass =
-      "w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-apple-text focus:border-apple-accent focus:ring-1 focus:ring-apple-accent focus:outline-none transition-colors";
-    const labelClass = "mb-1 block text-xs font-medium text-gray-600 uppercase tracking-wide";
 
     return (
       <>
@@ -374,142 +319,6 @@ export const ManageModal = component$<ManageModalProps>(
                       )}
                     </Button>
                   </ManageAction>
-
-                  {/* ── Record Sale ── */}
-                  <div class="overflow-hidden rounded-2xl border border-emerald-100/60 bg-emerald-50/40 transition-colors">
-                    {/* Header row — always visible */}
-                    <div class="flex items-center justify-between p-4">
-                      <div>
-                        <p class="font-semibold text-emerald-800">
-                          Record Sale
-                        </p>
-                        <p class="text-sm text-emerald-700">
-                          Log this device as sold to unlock revenue analytics
-                        </p>
-                      </div>
-                      <Button
-                        look="primary"
-                        size="sm"
-                        onClick$={() =>
-                          (showSaleForm.value = !showSaleForm.value)
-                        }
-                        disabled={isRecordingSale.value}
-                      >
-                        <TagIcon class="mr-1.5 h-3.5 w-3.5" />
-                        {showSaleForm.value ? "Cancel" : "Record"}
-                      </Button>
-                    </div>
-
-                    {/* Inline form — visible when expanded */}
-                    {showSaleForm.value && (
-                      <div class="border-t border-emerald-100/60 bg-white/60 px-4 pb-5 pt-4">
-                        <div class="grid grid-cols-2 gap-4">
-                          {/* Price */}
-                          <div class="col-span-2">
-                            <label for="sale-price" class={labelClass}>
-                              Sale Price (USD)
-                            </label>
-                            <input
-                              id="sale-price"
-                              type="number"
-                              min="0.01"
-                              step="0.01"
-                              placeholder="e.g. 1199.00"
-                              value={saleForm.price_usd}
-                              onInput$={(e) => {
-                                saleForm.price_usd = (
-                                  e.target as HTMLInputElement
-                                ).value;
-                              }}
-                              class={selectClass}
-                            />
-                          </div>
-
-                          {/* Region */}
-                          <div>
-                            <label for="sale-region" class={labelClass}>
-                              Region
-                            </label>
-                            <select
-                              id="sale-region"
-                              value={saleForm.region}
-                              onChange$={(e) => {
-                                saleForm.region = (
-                                  e.target as HTMLSelectElement
-                                ).value as SaleRecord["region"];
-                              }}
-                              class={selectClass}
-                            >
-                              <option value="US">US</option>
-                              <option value="EU">EU</option>
-                              <option value="APAC">APAC</option>
-                              <option value="LATAM">LATAM</option>
-                              <option value="OTHER">Other</option>
-                            </select>
-                          </div>
-
-                          {/* Channel */}
-                          <div>
-                            <label for="sale-channel" class={labelClass}>
-                              Channel
-                            </label>
-                            <select
-                              id="sale-channel"
-                              value={saleForm.channel}
-                              onChange$={(e) => {
-                                saleForm.channel = (
-                                  e.target as HTMLSelectElement
-                                ).value as SaleRecord["channel"];
-                              }}
-                              class={selectClass}
-                            >
-                              <option value="online">Online</option>
-                              <option value="retail">Retail</option>
-                              <option value="B2B">B2B</option>
-                            </select>
-                          </div>
-
-                          {/* Customer Segment */}
-                          <div class="col-span-2">
-                            <label for="sale-segment" class={labelClass}>
-                              Customer Segment
-                            </label>
-                            <select
-                              id="sale-segment"
-                              value={saleForm.customer_segment}
-                              onChange$={(e) => {
-                                saleForm.customer_segment = (
-                                  e.target as HTMLSelectElement
-                                ).value as SaleRecord["customer_segment"];
-                              }}
-                              class={selectClass}
-                            >
-                              <option value="consumer">Consumer</option>
-                              <option value="enterprise">Enterprise</option>
-                              <option value="education">Education</option>
-                            </select>
-                          </div>
-                        </div>
-
-                        <Button
-                          look="primary"
-                          size="sm"
-                          class="mt-4 w-full justify-center"
-                          onClick$={handleRecordSale}
-                          disabled={isRecordingSale.value}
-                        >
-                          {isRecordingSale.value ? (
-                            <>
-                              <Loader2Icon class="mr-2 h-3 w-3 animate-spin" />
-                              Saving...
-                            </>
-                          ) : (
-                            "Confirm Sale"
-                          )}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
 
                   <ManageAction
                     title="Unpair Device"

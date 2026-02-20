@@ -1,4 +1,5 @@
 import { component$, type PropFunction } from "@builder.io/qwik";
+import { TagIcon } from "lucide-qwik";
 import type { ProductTwin } from "../../services/api";
 import { Button } from "../ui/button/button";
 
@@ -6,10 +7,11 @@ interface TwinCardProps {
   twin: ProductTwin;
   onManage$: PropFunction<(twin: ProductTwin) => void>;
   onSpecs$: PropFunction<(twin: ProductTwin) => void>;
+  onSale$: PropFunction<(twin: ProductTwin) => void>;
 }
 
 export const TwinCard = component$<TwinCardProps>(
-  ({ twin, onManage$, onSpecs$ }) => {
+  ({ twin, onManage$, onSpecs$, onSale$ }) => {
     return (
       <article class="bg-apple-card border-apple-border glass rounded-[18px] border p-6 transition-transform duration-300 hover:scale-[1.02]">
         <h2 class="mb-4 text-2xl font-semibold">{twin.name}</h2>
@@ -36,7 +38,7 @@ export const TwinCard = component$<TwinCardProps>(
           </dd>
         </dl>
 
-        <div class="mt-6 flex gap-4 text-xs">
+        <div class="mt-6 flex gap-2 text-xs">
           <Button
             look="primary"
             onClick$={() => onManage$(twin)}
@@ -50,6 +52,14 @@ export const TwinCard = component$<TwinCardProps>(
             class="flex-1"
           >
             Specs
+          </Button>
+          <Button
+            look="secondary"
+            onClick$={() => onSale$(twin)}
+            class="flex-1 flex items-center justify-center gap-1.5"
+          >
+            <TagIcon class="h-3.5 w-3.5" />
+            Sale
           </Button>
         </div>
       </article>

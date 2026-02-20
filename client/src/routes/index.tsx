@@ -8,6 +8,7 @@ import {
 import { type DocumentHead, routeLoader$ } from "@builder.io/qwik-city";
 import { Loader2Icon, PlusIcon } from "lucide-qwik";
 import { ManageModal } from "../components/twin/ManageModal";
+import { SaleModal } from "../components/twin/SaleModal";
 import { SpecsModal } from "../components/twin/SpecsModal";
 import { TwinCard } from "../components/twin/TwinCard";
 import { Alert } from "../components/ui/alert/alert";
@@ -29,6 +30,7 @@ export default component$(() => {
   const selectedTwin = useSignal<ProductTwin | null>(null);
   const showSpecs = useSignal(false);
   const showManage = useSignal(false);
+  const showSale = useSignal(false);
 
   const {
     show: showAlert,
@@ -90,6 +92,11 @@ export default component$(() => {
   const handleOpenManage = $((twin: ProductTwin) => {
     selectedTwin.value = twin;
     showManage.value = true;
+  });
+
+  const handleOpenSale = $((twin: ProductTwin) => {
+    selectedTwin.value = twin;
+    showSale.value = true;
   });
 
   const handleTwinUpdate = $(async (updatedTwinId?: string) => {
@@ -169,6 +176,7 @@ export default component$(() => {
                   twin={twin}
                   onManage$={handleOpenManage}
                   onSpecs$={handleOpenSpecs}
+                  onSale$={handleOpenSale}
                 />
               ))}
 
@@ -209,6 +217,7 @@ export default component$(() => {
         twin={selectedTwin.value}
         onUpdate$={handleTwinUpdate}
       />
+      <SaleModal show={showSale} twin={selectedTwin.value} />
     </main>
   );
 });
