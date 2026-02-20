@@ -1,22 +1,17 @@
-import {
-  $,
-  component$,
-  type PropFunction,
-  type Signal,
-  useSignal,
-  useStore,
-  useTask$,
-} from "@builder.io/qwik";
-import { Loader2Icon, XIcon } from "lucide-qwik";
+import { $, component$, type PropFunction, type Signal, useSignal, useStore, useTask$ } from "@builder.io/qwik";
+import { Loader2Icon, PlusIcon, XIcon } from "lucide-qwik";
 import { useAlert } from "../../hooks/useAlert";
 import {
   type ProductTwin,
   type SaleRecord,
-  fetchSaleRecord,
+  deleteSaleRecord,
+  fetchSaleRecords,
   recordSale,
+  updateSaleRecord,
 } from "../../services/api";
 import { Alert } from "../ui/alert/alert";
 import { Modal } from "../ui/modal/modal";
+import { Button } from "../ui/button/button";
 import { SaleDetailView } from "./SaleDetailView";
 import { SaleEmptyState } from "./SaleEmptyState";
 import { type SaleFormStore, SaleForm } from "./SaleForm";
@@ -28,10 +23,11 @@ interface SaleModalProps {
 }
 
 export const SaleModal = component$<SaleModalProps>(({ show, twin, onRecorded$ }) => {
-  const isRecordingSale = useSignal(false);
-  const isLoadingExisting = useSignal(false);
-  const existingSale = useSignal<SaleRecord | null>(null);
-  const showForm = useSignal(false);
+  const isSubmitting = useSignal(false);
+  const isLoading = useSignal(false);
+  const existingSales = useSignal<SaleRecord[]>([]);
+  // null = no form open; string = editing record with that _id; "new" = adding new
+  const editingId = useSignal<string | null>(null);
 
   const saleForm = useStore<SaleFormStore>({
     price_usd: "",
@@ -43,44 +39,65 @@ export const SaleModal = component$<SaleModalProps>(({ show, twin, onRecorded$ }
   const { show: showAlert, message: alertMessage, type: alertType, notify } =
     useAlert();
 
-  // Fetch existing sale record whenever the modal opens for a new twin
+  const resetForm = $(() => {
+    saleForm.price_usd = "";
+    saleForm.region = "US";
+    saleForm.channel = "online";
+    saleForm.customer_segment = "consumer";
+  });
+
+  const loadSales = $(async (serial: string) => {
+    isLoading.value = true;
+    try {
+      existingSales.value = await fetchSaleRecords(serial);
+    } finally {
+      isLoading.value = false;
+    }
+  });
+
   useTask$(async ({ track }) => {
     const serial = track(() => twin?.serial_number);
     const isOpen = track(() => show.value);
 
-    // Only fetch if serial changes or modal opens, AND we don't have this record yet
     if (!serial || !isOpen) {
-      existingSale.value = null;
-      showForm.value = false;
+      existingSales.value = [];
+      editingId.value = null;
       return;
     }
 
-    // Skip if we already have the record for this serial
-    if (existingSale.value?.serial_number === serial) {
-      return;
-    }
+    await loadSales(serial);
+  });
 
-    isLoadingExisting.value = true;
+  const handleAddNew = $(() => {
+    resetForm();
+    editingId.value = "new";
+  });
+
+  const handleEdit = $((sale: SaleRecord) => {
+    saleForm.price_usd = String(sale.price_usd);
+    saleForm.region = sale.region;
+    saleForm.channel = sale.channel;
+    saleForm.customer_segment = sale.customer_segment;
+    editingId.value = sale._id;
+  });
+
+  const handleDelete = $(async (sale: SaleRecord) => {
+    if (!twin) return;
     try {
-      existingSale.value = await fetchSaleRecord(serial);
-      // Pre-fill form with existing values if a record exists
-      if (existingSale.value) {
-        saleForm.price_usd = String(existingSale.value.price_usd);
-        saleForm.region = existingSale.value.region;
-        saleForm.channel = existingSale.value.channel;
-        saleForm.customer_segment = existingSale.value.customer_segment;
-      } else {
-        saleForm.price_usd = "";
-        saleForm.region = "US";
-        saleForm.channel = "online";
-        saleForm.customer_segment = "consumer";
-      }
-    } finally {
-      isLoadingExisting.value = false;
+      await deleteSaleRecord(twin.serial_number, sale._id);
+      await loadSales(twin.serial_number);
+      notify("Sale record deleted.", "success");
+      if (onRecorded$) await onRecorded$();
+    } catch {
+      notify("Failed to delete sale record.", "error");
     }
   });
 
-  const handleRecordSale = $(async () => {
+  const handleCancel = $(() => {
+    editingId.value = null;
+  });
+
+  const handleSubmit = $(async () => {
     if (!twin) return;
     const price = parseFloat(saleForm.price_usd);
     if (Number.isNaN(price) || price <= 0) {
@@ -88,31 +105,32 @@ export const SaleModal = component$<SaleModalProps>(({ show, twin, onRecorded$ }
       return;
     }
 
-    isRecordingSale.value = true;
+    isSubmitting.value = true;
     try {
-      const result = await recordSale({
+      const payload = {
         serial_number: twin.serial_number,
         price_usd: price,
         region: saleForm.region,
         channel: saleForm.channel,
         customer_segment: saleForm.customer_segment,
-        sold_at: existingSale.value?.sold_at ?? new Date().toISOString(),
-      });
-      existingSale.value = result;
-      // Sync form with the saved result to ensure session consistency
-      saleForm.price_usd = String(result.price_usd);
-      saleForm.region = result.region;
-      saleForm.channel = result.channel;
-      saleForm.customer_segment = result.customer_segment;
+        sold_at: new Date().toISOString(),
+      };
 
-      showForm.value = false;
-      notify(`Sale saved — $${price.toFixed(2)} (${saleForm.region})`, "success");
+      if (editingId.value && editingId.value !== "new") {
+        await updateSaleRecord(twin.serial_number, editingId.value, payload);
+        notify(`Sale updated — $${price.toFixed(2)} (${saleForm.region})`, "success");
+      } else {
+        await recordSale(payload);
+        notify(`Sale recorded — $${price.toFixed(2)} (${saleForm.region})`, "success");
+      }
+
+      editingId.value = null;
+      await loadSales(twin.serial_number);
       if (onRecorded$) await onRecorded$();
-    } catch (e) {
-      console.error(e);
+    } catch {
       notify("Failed to save sale.", "error");
     } finally {
-      isRecordingSale.value = false;
+      isSubmitting.value = false;
     }
   });
 
@@ -124,7 +142,7 @@ export const SaleModal = component$<SaleModalProps>(({ show, twin, onRecorded$ }
             {/* Header */}
             <div class="mb-6 flex items-start justify-between">
               <div>
-                <Modal.Title>Sale Record</Modal.Title>
+                <Modal.Title>Sale Records</Modal.Title>
                 <Modal.Description>{twin.name} · {twin.serial_number}</Modal.Description>
               </div>
               <button
@@ -138,34 +156,52 @@ export const SaleModal = component$<SaleModalProps>(({ show, twin, onRecorded$ }
 
             <Alert show={showAlert} message={alertMessage} type={alertType.value} />
 
-            {/* Loading state */}
-            {isLoadingExisting.value && (
+            {/* Loading */}
+            {isLoading.value && (
               <div class="flex items-center justify-center gap-3 py-10 text-gray-400">
                 <Loader2Icon class="h-5 w-5 animate-spin" />
-                <span class="text-sm">Fetching sale record…</span>
+                <span class="text-sm">Loading sale records…</span>
               </div>
             )}
 
-            {/* Existing sale record */}
-            {!isLoadingExisting.value && existingSale.value && !showForm.value && (
-              <SaleDetailView
-                sale={existingSale.value}
-                onEdit$={$(() => (showForm.value = true))}
-              />
+            {/* List of existing records */}
+            {!isLoading.value && editingId.value === null && (
+              <div class="space-y-3">
+                {existingSales.value.length === 0 && (
+                  <SaleEmptyState onRecord$={handleAddNew} />
+                )}
+
+                {existingSales.value.map((sale) => (
+                  <SaleDetailView
+                    key={sale._id}
+                    sale={sale}
+                    onEdit$={$(async () => handleEdit(sale))}
+                    onDelete$={$(async () => handleDelete(sale))}
+                  />
+                ))}
+
+                {existingSales.value.length > 0 && (
+                  <Button
+                    look="secondary"
+                    size="sm"
+                    class="mt-2 w-full justify-center gap-2"
+                    onClick$={handleAddNew}
+                  >
+                    <PlusIcon class="h-4 w-4" />
+                    Add Another Sale
+                  </Button>
+                )}
+              </div>
             )}
 
-            {/* No sale yet */}
-            {!isLoadingExisting.value && !existingSale.value && !showForm.value && (
-              <SaleEmptyState onRecord$={$(() => (showForm.value = true))} />
-            )}
-
-            {/* Form */}
-            {!isLoadingExisting.value && showForm.value && (
+            {/* Form (add new or edit existing) */}
+            {!isLoading.value && editingId.value !== null && (
               <SaleForm
                 form={saleForm}
-                isSubmitting={isRecordingSale}
-                onCancel$={$(() => (showForm.value = false))}
-                onSubmit$={handleRecordSale}
+                isSubmitting={isSubmitting}
+                isEditing={editingId.value !== "new"}
+                onCancel$={handleCancel}
+                onSubmit$={handleSubmit}
               />
             )}
           </div>

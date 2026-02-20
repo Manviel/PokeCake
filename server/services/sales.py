@@ -1,34 +1,71 @@
+from bson import ObjectId
+
 from database import db
 
 
 async def create_sale_record(data: dict) -> dict:
     """
-    Upsert a sale record for a device. One record per serial number.
+    Insert a new sale record for a device.
+    A single twin can have multiple sale records (one per market segment / channel).
     """
-    await db.sale_records.update_one(
-        {"serial_number": data["serial_number"]},
-        {"$set": data},
-        upsert=True,
-    )
-    record = await db.sale_records.find_one({"serial_number": data["serial_number"]})
+    result = await db.sale_records.insert_one(data)
+    record = await db.sale_records.find_one({"_id": result.inserted_id})
     record["_id"] = str(record["_id"])
     return record
 
 
+async def get_sales_by_serial(serial_number: str) -> list[dict]:
+    """
+    Fetch all sale records for a single device, sorted newest first.
+    Returns an empty list if no records exist.
+    """
+    cursor = db.sale_records.find({"serial_number": serial_number}).sort(
+        "sold_at", -1
+    )
+    records = await cursor.to_list(length=None)
+    for r in records:
+        r["_id"] = str(r["_id"])
+    return records
+
+
 async def get_sale_by_serial(serial_number: str) -> dict | None:
     """
-    Fetch the sale record for a single device, or None if not sold yet.
+    Backwards-compat helper used by analytics worker.
+    Returns the most recent sale record for a device, or None.
     """
-    record = await db.sale_records.find_one({"serial_number": serial_number})
+    records = await get_sales_by_serial(serial_number)
+    return records[0] if records else None
+
+
+async def update_sale_record(sale_id: str, data: dict) -> dict | None:
+    """
+    Update a single sale record by its MongoDB _id.
+    Returns the updated record, or None if not found.
+    """
+    await db.sale_records.update_one(
+        {"_id": ObjectId(sale_id)},
+        {"$set": data},
+    )
+    record = await db.sale_records.find_one({"_id": ObjectId(sale_id)})
     if record:
         record["_id"] = str(record["_id"])
     return record
+
+
+async def delete_sale_record(sale_id: str) -> bool:
+    """
+    Delete a single sale record by its MongoDB _id.
+    Returns True if a document was deleted.
+    """
+    result = await db.sale_records.delete_one({"_id": ObjectId(sale_id)})
+    return result.deleted_count > 0
 
 
 async def get_sales_summary() -> dict:
     """
     Fleet-level aggregation: total revenue, devices at risk, breakdown by region and channel.
     Joins sale_records with device_analytics to surface financial risk.
+    Works correctly with multiple sale records per twin.
     """
     # Total revenue and per-region / per-channel breakdown from sale_records
     revenue_pipeline = [

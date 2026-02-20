@@ -8,7 +8,7 @@ import aio_pika
 from database import db
 from services.analytics import detect_anomalies, train_model_and_forecast
 from services.rabbitmq import ANALYTICS_QUEUE, get_rabbitmq
-from services.sales import get_sale_by_serial
+from services.sales import get_sales_by_serial
 
 logger = logging.getLogger(__name__)
 
@@ -42,15 +42,18 @@ class AnalyticsWorker:
                     else "stable"
                 )
 
-                # 4. Join SaleRecord to derive financial risk metrics
+                # 4. Join SaleRecords to derive financial risk metrics
+                # A twin may have multiple sale records; we aggregate across all of them.
                 now = datetime.utcnow()
-                sale = await get_sale_by_serial(serial_number)
-                if sale:
-                    days_since_sale = (now - sale["sold_at"]).days
-                    revenue_at_risk = round(
-                        sale["price_usd"] * (1 - health_score / 100), 2
-                    )
+                sales = await get_sales_by_serial(serial_number)
+                if sales:
+                    # Most recent sale drives warranty / time-based risk
+                    most_recent = sales[0]
+                    days_since_sale = (now - most_recent["sold_at"]).days
                     return_risk_flag = health_score < 40 and days_since_sale < 365
+                    # Revenue at risk is the sum across ALL sale records for this twin
+                    total_revenue = sum(s["price_usd"] for s in sales)
+                    revenue_at_risk = round(total_revenue * (1 - health_score / 100), 2)
                 else:
                     days_since_sale = None
                     revenue_at_risk = None

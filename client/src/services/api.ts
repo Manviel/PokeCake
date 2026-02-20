@@ -158,7 +158,7 @@ export interface SaleRecord {
   _id: string;
   serial_number: string;
   price_usd: number;
-  region: "US" | "EU" | "APAC" | "LATAM" | "OTHER";
+  region: "US" | "EU" | "APAC" | "LATAM";
   channel: "online" | "retail" | "B2B";
   customer_segment: "consumer" | "enterprise" | "education";
   sold_at: string;
@@ -194,13 +194,14 @@ export const fetchDeviceAnalytics = async (
   return response.json();
 };
 
-export const fetchSaleRecord = async (
+export const fetchSaleRecords = async (
   serial: string,
-): Promise<SaleRecord | null> => {
+): Promise<SaleRecord[]> => {
   const response = await fetch(`${API_BASE}/sales/${serial}`);
-  if (!response.ok) return null;
+  if (!response.ok) return [];
   return response.json();
 };
+
 
 export const fetchSalesSummary = async (): Promise<SalesSummary> => {
   const response = await fetch(`${API_BASE}/sales/summary`);
@@ -226,4 +227,28 @@ export const recordSale = async (
   });
   if (!response.ok) throw new Error("Failed to record sale");
   return response.json();
+};
+
+export const updateSaleRecord = async (
+  serial: string,
+  saleId: string,
+  data: Omit<SaleRecord, "_id">,
+): Promise<SaleRecord> => {
+  const response = await fetch(`${API_BASE}/sales/${serial}/${saleId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error("Failed to update sale");
+  return response.json();
+};
+
+export const deleteSaleRecord = async (
+  serial: string,
+  saleId: string,
+): Promise<void> => {
+  const response = await fetch(`${API_BASE}/sales/${serial}/${saleId}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) throw new Error("Failed to delete sale");
 };

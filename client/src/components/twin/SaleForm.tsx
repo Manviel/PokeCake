@@ -18,6 +18,7 @@ export interface SaleFormStore {
 interface SaleFormProps {
   form: SaleFormStore;
   isSubmitting: ReadonlySignal<boolean>;
+  isEditing?: boolean;
   onCancel$: QRL<() => void>;
   onSubmit$: QRL<() => void>;
 }
@@ -28,7 +29,7 @@ const labelClass =
   "mb-1 block text-xs font-medium text-gray-500 uppercase tracking-wide";
 
 export const SaleForm = component$<SaleFormProps>(
-  ({ form, isSubmitting, onCancel$, onSubmit$ }) => {
+  ({ form, isSubmitting, isEditing = false, onCancel$, onSubmit$ }) => {
     const handleSelectChange = $((e: Event, key: keyof SaleFormStore) => {
       const target = e.target as HTMLSelectElement;
       const val = target.value;
@@ -73,7 +74,6 @@ export const SaleForm = component$<SaleFormProps>(
               <option value="EU">EU</option>
               <option value="APAC">APAC</option>
               <option value="LATAM">LATAM</option>
-              <option value="OTHER">Other</option>
             </select>
           </div>
 
@@ -132,6 +132,8 @@ export const SaleForm = component$<SaleFormProps>(
                 <Loader2Icon class="mr-2 h-3 w-3 animate-spin" />
                 Saving…
               </>
+            ) : isEditing ? (
+              "Update Sale"
             ) : (
               "Confirm Sale"
             )}

@@ -47,7 +47,7 @@ class ProductTwin(BaseModel):
 class SaleRecordCreate(BaseModel):
     serial_number: str
     price_usd: float = Field(..., gt=0, description="Sale price in USD")
-    region: Literal["US", "EU", "APAC", "LATAM", "OTHER"] = Field(default="US")
+    region: Literal["US", "EU", "APAC", "LATAM"] = Field(default="US")
     channel: Literal["online", "retail", "B2B"] = Field(default="online")
     customer_segment: Literal["consumer", "enterprise", "education"] = Field(
         default="consumer"
