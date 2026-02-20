@@ -62,6 +62,17 @@ async def update_twin(
 
     updated_twin = await db.twins.find_one({"_id": ObjectId(twin_id)})
     updated_twin["_id"] = str(updated_twin["_id"])
+
+    # If OS version was updated, trigger a software update simulation on hardware
+    if "os_version" in update_data:
+        await publish_command(
+            {
+                "target_serial": updated_twin["serial_number"],
+                "action": "SOFTWARE_UPDATE",
+                "timestamp": str(datetime.utcnow()),
+            }
+        )
+
     return updated_twin
 
 

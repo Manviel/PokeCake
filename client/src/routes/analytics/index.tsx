@@ -114,6 +114,8 @@ export default component$(() => {
       <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] bg-[size:14px_24px]"></div>
 
       <div class="relative z-10 mx-auto max-w-7xl space-y-8">
+        <SalesSummaryCard summary={salesSummaryLoader.value} />
+
         {/* Header + device selector */}
         <header class="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-900/80 p-6 shadow-2xl backdrop-blur-xl">
           <div>
@@ -162,10 +164,7 @@ export default component$(() => {
             </div>
           )}
         </header>
-
-        {/* ── Fleet Sales Summary ── */}
-        <SalesSummaryCard summary={salesSummaryLoader.value} />
-
+        
         {state.loading && !state.history.length && state.selectedTwin && (
           <div class="flex animate-pulse justify-center space-x-4 p-12">
             <div class="text-xl text-slate-500">Initializing AI Models...</div>

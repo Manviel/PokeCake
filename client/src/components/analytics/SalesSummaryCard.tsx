@@ -23,8 +23,7 @@ export const SalesSummaryCard = component$<SalesSummaryCardProps>(
     return (
       <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md">
         <h2 class="mb-6 flex items-center gap-2 text-xl font-semibold text-slate-200">
-          <span class="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.6)]"></span>
-          Fleet Sales Overview
+          Sales Overview
         </h2>
 
         {/* KPI row */}

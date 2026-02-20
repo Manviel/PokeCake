@@ -5,6 +5,7 @@ import os
 import random
 import json
 import asyncio
+import time
 
 import aio_pika
 from database import db
@@ -45,13 +46,10 @@ class SimulationModel:
         
         # Target Physics Laws (Approximation)
         # 1. Temperature approaches a steady state based on CPU load
-        # steady_state_temp = 30 + (CPU / 100) * 50  (Max ~80C)
-        # delta_temp = k * (steady_state - current_temp)
         steady_state_temp = 30 + (X_cpu / 100.0) * 50
         y_temp_delta = 0.1 * (steady_state_temp - X_temp) + np.random.normal(0, 0.5, n_samples)
         
-        # 2. Battery Drain depends on CPU and Temp (higher temp = slightly faster drain)
-        # drain = base + cpu_factor + temp_loss
+        # 2. Battery Drain depends on CPU and Temp
         y_battery_delta = -(0.01 + (X_cpu / 1000.0) * 0.5 + (X_temp / 100.0) * 0.05) + np.random.normal(0, 0.001, n_samples)
 
         # Prepare DataFrame for Training
@@ -93,43 +91,38 @@ class DeviceSimulator:
             'charging': 0.0  # 0 or 1
         }])
         
-        self.active_ticks_remaining = 0
+        self.is_high_load = False
 
     def trigger_diagnostics(self):
-        self.active_ticks_remaining = 10
-        # Force high CPU usage in next update by setting state
+        # Force high CPU usage for the duration of activity
+        self.is_high_load = True
         self.state.loc[0, 'cpu'] = 95.0
 
+    def trigger_update(self):
+        # Moderate load for software updates
+        self.is_high_load = True
+        self.state.loc[0, 'cpu'] = 45.0
+
+    def cooldown(self):
+        self.is_high_load = False
+
     def update(self):
-        # 1. Determine Next CPU State (Random Walk or Diagnostics override)
+        # 1. Determine Next CPU State
         current_cpu = self.state.loc[0, 'cpu']
         
-        if self.active_ticks_remaining > 0:
-            target_cpu = 95.0
-            self.active_ticks_remaining -= 1
+        if self.is_high_load:
+            # Maintain higher load if triggered
+            target_cpu = current_cpu
         else:
-            # Idle/Normal behavior: Target low CPU (idle state)
-            # Most of the time, the device should be idling (0-5% CPU)
+            # Idle/Normal behavior: Target low CPU
             target_cpu = np.random.uniform(0.0, 5.0)
-            
-            # Random User Activity (Spikes/Usage)
-            # 10% chance to be in "active usage" mode (10-40% CPU)
-            if random.random() < 0.10:
-                target_cpu = np.random.uniform(10.0, 40.0)
-            
-            # Rare heavy spikes (1% chance)
-            if random.random() < 0.01:
-                target_cpu = np.random.uniform(60.0, 90.0)
 
-        # Smooth CPU transition (pandas ewm equivalent mostly, but simple linear interpolation here for step)
+        # Smooth CPU transition
         next_cpu = 0.7 * current_cpu + 0.3 * target_cpu
         self.state.loc[0, 'cpu'] = next_cpu
 
         # 2. Predict Physics (Temp & Battery) using ML Model
-        # Input features: [cpu, temp]
         current_temp = self.state.loc[0, 'temp']
-        
-        # Predict deltas
         temp_delta, battery_delta = self.model.predict(self.state[['cpu', 'temp']])
         
         # Apply deltas
@@ -145,11 +138,8 @@ class DeviceSimulator:
                  self.state.loc[0, 'charging'] = 0.0
         else:
              self.state.loc[0, 'battery'] = max(0.0, current_battery + battery_delta[0])
-             # Auto-charge if too low
              if self.state.loc[0, 'battery'] < 10.0:
                  self.state.loc[0, 'charging'] = 1.0
-
-
 
         return {
             "serial_number": self.serial_number,
@@ -161,8 +151,8 @@ class DeviceSimulator:
 
 
 async def run_simulation():
-    """Simulator background task."""
-    print("🚀 Starting Device Simulation Task...")
+    """Event-driven simulator background task."""
+    print("🚀 Starting Event-Driven Device Simulation Task...")
 
     connection = None
     try:
@@ -173,6 +163,10 @@ async def run_simulation():
         command_queue = await channel.declare_queue("device_commands", durable=True)
 
         simulators = {}
+        # Active sessions registry: serial -> expiry_timestamp
+        active_sessions = {}
+        
+        LIVE_DURATION = 30 # seconds
 
         async def on_command(message: aio_pika.IncomingMessage):
             async with message.process():
@@ -180,32 +174,44 @@ async def run_simulation():
                     payload = json.loads(message.body)
                     serial = payload.get("target_serial")
                     action = payload.get("action")
+                    
+                    if not serial:
+                        return
 
-                    if serial in simulators:
-                        print(f" [!] Stimulating Hardware for {serial}: {action}")
-                        if action == "RUN_DIAGNOSTICS":
-                            simulators[serial].trigger_diagnostics()
+                    if serial not in simulators:
+                        simulators[serial] = DeviceSimulator(serial)
+                    
+                    print(f" [!] Waking up hardware for {serial}: {action}")
+                    active_sessions[serial] = time.time() + LIVE_DURATION
+                    
+                    if action == "RUN_DIAGNOSTICS":
+                        simulators[serial].trigger_diagnostics()
+                    elif action == "SOFTWARE_UPDATE":
+                        simulators[serial].trigger_update()
+                        
                 except Exception as e:
                     print(f"Error handling command in simulator: {e}")
 
         await command_queue.consume(on_command)
 
         while True:
-            cursor = db.twins.find({}, {"serial_number": 1})
-            db_serials = [doc["serial_number"] async for doc in cursor]
-
-            for s in db_serials:
-                if s not in simulators:
-                    simulators[s] = DeviceSimulator(s)
-
-            # Remove simulators for deleted twins to prevent memory leak
-            for s in list(simulators.keys()):
-                if s not in db_serials:
-                    del simulators[s]
-
-            for serial, sim in simulators.items():
-                data = sim.update()
-                if data:
+            now = time.time()
+            
+            # Prune and process active sessions
+            active_serials = list(active_sessions.keys())
+            for serial in active_serials:
+                expiry = active_sessions[serial]
+                
+                if now > expiry:
+                    print(f" [-] Device {serial} going back to idle.")
+                    if serial in simulators:
+                        simulators[serial].cooldown()
+                    del active_sessions[serial]
+                    continue
+                
+                # Update and emit telemetry
+                if serial in simulators:
+                    data = simulators[serial].update()
                     await exchange.publish(
                         aio_pika.Message(body=json.dumps(data).encode()),
                         routing_key="telemetry_updates",
