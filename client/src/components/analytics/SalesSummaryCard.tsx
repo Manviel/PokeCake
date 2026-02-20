@@ -6,6 +6,8 @@ import {
   PackageIcon,
   TrendingDownIcon,
 } from "lucide-qwik";
+import { KpiCard } from "./KpiCard";
+import { RevenueBreakdown } from "./RevenueBreakdown";
 
 interface SalesSummaryCardProps {
   summary: SalesSummary;
@@ -27,129 +29,64 @@ export const SalesSummaryCard = component$<SalesSummaryCardProps>(
 
         {/* KPI row */}
         <div class="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-          {/* Total Revenue */}
-          <div class="rounded-2xl border border-white/5 bg-white/5 p-4">
-            <div class="mb-1 flex items-center gap-2 text-xs font-medium tracking-wider text-slate-400 uppercase">
-              <DollarSignIcon class="h-3.5 w-3.5" />
-              Total Revenue
-            </div>
-            <div class="text-2xl font-bold text-white">
-              ${summary.total_revenue.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-            </div>
-            <div class="mt-0.5 text-xs text-slate-500">
-              {summary.total_units_sold} units sold
-            </div>
-          </div>
+          <KpiCard
+            label="Total Revenue"
+            value={`$${summary.total_revenue.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
+            subLabel={`${summary.total_units_sold} units sold`}
+            variant="default"
+          >
+            <DollarSignIcon q:slot="icon" class="h-3.5 w-3.5" />
+          </KpiCard>
 
-          {/* Revenue at Risk */}
-          <div class="rounded-2xl border border-red-500/20 bg-red-500/5 p-4">
-            <div class="mb-1 flex items-center gap-2 text-xs font-medium tracking-wider text-red-400 uppercase">
-              <TrendingDownIcon class="h-3.5 w-3.5" />
-              Revenue at Risk
-            </div>
-            <div class="text-2xl font-bold text-red-300">
-              ${summary.total_revenue_at_risk.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-            </div>
-            <div class="mt-0.5 text-xs text-red-500/70">
-              {atRiskPct.toFixed(1)}% of portfolio
-            </div>
-          </div>
+          <KpiCard
+            label="Revenue at Risk"
+            value={`$${summary.total_revenue_at_risk.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
+            subLabel={`${atRiskPct.toFixed(1)}% of portfolio`}
+            variant="danger"
+          >
+            <TrendingDownIcon q:slot="icon" class="h-3.5 w-3.5" />
+          </KpiCard>
 
-          {/* Devices at Risk */}
-          <div class="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4">
-            <div class="mb-1 flex items-center gap-2 text-xs font-medium tracking-wider text-amber-400 uppercase">
-              <ShieldAlertIcon class="h-3.5 w-3.5" />
-              Devices at Risk
-            </div>
-            <div class="text-2xl font-bold text-amber-300">
-              {summary.devices_at_risk}
-            </div>
-            <div class="mt-0.5 text-xs text-amber-500/70">
-              health &lt; 40 within warranty
-            </div>
-          </div>
+          <KpiCard
+            label="Devices at Risk"
+            value={String(summary.devices_at_risk)}
+            subLabel="health < 40 within warranty"
+            variant="warning"
+          >
+            <ShieldAlertIcon q:slot="icon" class="h-3.5 w-3.5" />
+          </KpiCard>
 
-          {/* Units Sold */}
-          <div class="rounded-2xl border border-white/5 bg-white/5 p-4">
-            <div class="mb-1 flex items-center gap-2 text-xs font-medium tracking-wider text-slate-400 uppercase">
-              <PackageIcon class="h-3.5 w-3.5" />
-              Units Sold
-            </div>
-            <div class="text-2xl font-bold text-white">
-              {summary.total_units_sold}
-            </div>
-            <div class="mt-0.5 text-xs text-slate-500">across all regions</div>
-          </div>
+          <KpiCard
+            label="Units Sold"
+            value={String(summary.total_units_sold)}
+            subLabel="across all regions"
+            variant="default"
+          >
+            <PackageIcon q:slot="icon" class="h-3.5 w-3.5" />
+          </KpiCard>
         </div>
 
         {/* Breakdowns */}
         {(summary.by_region.length > 0 || summary.by_channel.length > 0) && (
           <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {/* By Region */}
-            {summary.by_region.length > 0 && (
-              <div>
-                <h3 class="mb-3 text-xs font-medium tracking-wider text-slate-500 uppercase">
-                  By Region
-                </h3>
-                <div class="space-y-2">
-                  {summary.by_region.map((r) => {
-                    const pct =
-                      summary.total_revenue > 0
-                        ? (r.revenue / summary.total_revenue) * 100
-                        : 0;
-                    return (
-                      <div key={r.region}>
-                        <div class="mb-1 flex justify-between text-xs text-slate-400">
-                          <span>{r.region}</span>
-                          <span class="text-slate-200">
-                            ${r.revenue.toLocaleString("en-US", { maximumFractionDigits: 0 })}
-                          </span>
-                        </div>
-                        <div class="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
-                          <div
-                            class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-300 transition-all duration-700"
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* By Channel */}
-            {summary.by_channel.length > 0 && (
-              <div>
-                <h3 class="mb-3 text-xs font-medium tracking-wider text-slate-500 uppercase">
-                  By Channel
-                </h3>
-                <div class="space-y-2">
-                  {summary.by_channel.map((c) => {
-                    const pct =
-                      summary.total_revenue > 0
-                        ? (c.revenue / summary.total_revenue) * 100
-                        : 0;
-                    return (
-                      <div key={c.channel}>
-                        <div class="mb-1 flex justify-between text-xs text-slate-400">
-                          <span class="capitalize">{c.channel}</span>
-                          <span class="text-slate-200">
-                            ${c.revenue.toLocaleString("en-US", { maximumFractionDigits: 0 })}
-                          </span>
-                        </div>
-                        <div class="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
-                          <div
-                            class="h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-300 transition-all duration-700"
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+            <RevenueBreakdown
+              title="By Region"
+              rows={summary.by_region.map((r) => ({
+                label: r.region,
+                revenue: r.revenue,
+              }))}
+              total={summary.total_revenue}
+              color="emerald"
+            />
+            <RevenueBreakdown
+              title="By Channel"
+              rows={summary.by_channel.map((c) => ({
+                label: c.channel,
+                revenue: c.revenue,
+              }))}
+              total={summary.total_revenue}
+              color="blue"
+            />
           </div>
         )}
 

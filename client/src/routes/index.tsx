@@ -1,12 +1,11 @@
 import {
   $,
   component$,
-  useOnDocument,
-  useOnWindow,
   useSignal,
 } from "@builder.io/qwik";
 import { type DocumentHead, routeLoader$ } from "@builder.io/qwik-city";
-import { Loader2Icon, PlusIcon } from "lucide-qwik";
+import { useTwinSocket } from "../hooks/useTwinSocket";
+import { AddDeviceCard } from "../components/twin/AddDeviceCard";
 import { ManageModal } from "../components/twin/ManageModal";
 import { SaleModal } from "../components/twin/SaleModal";
 import { SpecsModal } from "../components/twin/SpecsModal";
@@ -15,7 +14,6 @@ import { Alert } from "../components/ui/alert/alert";
 import { Button } from "../components/ui/button/button";
 import { useAlert } from "../hooks/useAlert";
 import { fetchTwins, type ProductTwin, pairNewDevice } from "../services/api";
-import { socketService } from "../services/socket";
 
 export const useTwinsLoader = routeLoader$(async () => {
   return await fetchTwins();
@@ -39,6 +37,9 @@ export default component$(() => {
     notify,
   } = useAlert();
 
+  // Wire up WebSocket telemetry updates
+  useTwinSocket(twins, selectedTwin);
+
   const loadTwins = $(async () => {
     isLoading.value = true;
     try {
@@ -49,40 +50,6 @@ export default component$(() => {
       isLoading.value = false;
     }
   });
-
-  useOnWindow(
-    "load",
-    $(() => {
-      socketService.connect();
-
-      socketService.onTelemetryUpdate((data) => {
-        const currentSelectedTwin = selectedTwin.value;
-
-        const updatedTwins = twins.value.map((t) => {
-          if (t._id === data._id) {
-            const updated = { ...t, ...data };
-
-            if (currentSelectedTwin?._id === data._id) {
-              selectedTwin.value = updated;
-            }
-
-            return updated;
-          }
-          return t;
-        });
-        twins.value = [...updatedTwins];
-      });
-    }),
-  );
-
-  useOnDocument(
-    "qvisible",
-    $(() => {
-      return () => {
-        socketService.disconnect();
-      };
-    }),
-  );
 
   const handleOpenSpecs = $((twin: ProductTwin) => {
     selectedTwin.value = twin;
@@ -180,32 +147,7 @@ export default component$(() => {
                 />
               ))}
 
-              {/* Add New Device Card */}
-              <button
-                type="button"
-                onClick$={handlePairDevice}
-                disabled={isPairing.value}
-                class="bg-apple-card border-apple-border group glass flex min-h-[300px] flex-col items-center justify-center rounded-[18px] border border-dashed p-6 transition-colors hover:bg-black/5"
-              >
-                {isPairing.value ? (
-                  <div class="flex flex-col items-center gap-4">
-                    <Loader2Icon class="text-apple-accent h-10 w-10 animate-spin" />
-                    <span class="text-apple-text font-medium">Scanning...</span>
-                  </div>
-                ) : (
-                  <>
-                    <div class="bg-apple-accent/10 text-apple-accent mb-4 flex h-12 w-12 items-center justify-center rounded-full transition-transform group-hover:scale-110">
-                      <PlusIcon size={24} />
-                    </div>
-                    <span class="text-apple-text font-medium">
-                      Pair New Device
-                    </span>
-                    <span class="text-apple-text-secondary mt-2 text-xs">
-                      Scan for nearby Apple devices
-                    </span>
-                  </>
-                )}
-              </button>
+              <AddDeviceCard isPairing={isPairing} onClick$={handlePairDevice} />
             </>
           )}
         </div>
