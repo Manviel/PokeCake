@@ -46,11 +46,17 @@ export const SaleModal = component$<SaleModalProps>(({ show, twin, onRecorded$ }
   // Fetch existing sale record whenever the modal opens for a new twin
   useTask$(async ({ track }) => {
     const serial = track(() => twin?.serial_number);
-    track(() => show.value);
+    const isOpen = track(() => show.value);
 
-    if (!serial || !show.value) {
+    // Only fetch if serial changes or modal opens, AND we don't have this record yet
+    if (!serial || !isOpen) {
       existingSale.value = null;
       showForm.value = false;
+      return;
+    }
+
+    // Skip if we already have the record for this serial
+    if (existingSale.value?.serial_number === serial) {
       return;
     }
 
@@ -93,6 +99,12 @@ export const SaleModal = component$<SaleModalProps>(({ show, twin, onRecorded$ }
         sold_at: existingSale.value?.sold_at ?? new Date().toISOString(),
       });
       existingSale.value = result;
+      // Sync form with the saved result to ensure session consistency
+      saleForm.price_usd = String(result.price_usd);
+      saleForm.region = result.region;
+      saleForm.channel = result.channel;
+      saleForm.customer_segment = result.customer_segment;
+
       showForm.value = false;
       notify(`Sale saved — $${price.toFixed(2)} (${saleForm.region})`, "success");
       if (onRecorded$) await onRecorded$();

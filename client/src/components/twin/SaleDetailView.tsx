@@ -67,7 +67,7 @@ export const SaleDetailView = component$<SaleDetailViewProps>(
         </div>
 
         <Button
-          look="secondary"
+          look="primary"
           size="sm"
           class="w-full justify-center"
           onClick$={onEdit$}

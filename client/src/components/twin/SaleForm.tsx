@@ -1,4 +1,5 @@
 import {
+  $,
   component$,
   type QRL,
   type ReadonlySignal,
@@ -28,6 +29,15 @@ const labelClass =
 
 export const SaleForm = component$<SaleFormProps>(
   ({ form, isSubmitting, onCancel$, onSubmit$ }) => {
+    const handleSelectChange = $((e: Event, key: keyof SaleFormStore) => {
+      const target = e.target as HTMLSelectElement;
+      const val = target.value;
+      if (key === "region") form.region = val as SaleRecord["region"];
+      else if (key === "channel") form.channel = val as SaleRecord["channel"];
+      else if (key === "customer_segment")
+        form.customer_segment = val as SaleRecord["customer_segment"];
+    });
+
     return (
       <div class="space-y-4">
         <div class="grid grid-cols-2 gap-4">
@@ -56,11 +66,7 @@ export const SaleForm = component$<SaleFormProps>(
             <select
               id="sale-region"
               value={form.region}
-              onChange$={(e) => {
-                form.region = (
-                  e.target as HTMLSelectElement
-                ).value as SaleRecord["region"];
-              }}
+              onChange$={(e) => handleSelectChange(e, "region")}
               class={selectClass}
             >
               <option value="US">US</option>
@@ -78,11 +84,7 @@ export const SaleForm = component$<SaleFormProps>(
             <select
               id="sale-channel"
               value={form.channel}
-              onChange$={(e) => {
-                form.channel = (
-                  e.target as HTMLSelectElement
-                ).value as SaleRecord["channel"];
-              }}
+              onChange$={(e) => handleSelectChange(e, "channel")}
               class={selectClass}
             >
               <option value="online">Online</option>
@@ -98,11 +100,7 @@ export const SaleForm = component$<SaleFormProps>(
             <select
               id="sale-segment"
               value={form.customer_segment}
-              onChange$={(e) => {
-                form.customer_segment = (
-                  e.target as HTMLSelectElement
-                ).value as SaleRecord["customer_segment"];
-              }}
+              onChange$={(e) => handleSelectChange(e, "customer_segment")}
               class={selectClass}
             >
               <option value="consumer">Consumer</option>
