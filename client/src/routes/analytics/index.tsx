@@ -1,13 +1,19 @@
 import { component$, useStore, useTask$ } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { Select } from "@qwik-ui/headless";
-import { CheckIcon, ChevronDownIcon } from "lucide-qwik";
+import { CheckIcon, ChevronDownIcon, ActivityIcon, TrendingUpIcon, TrendingDownIcon, MinusIcon } from "lucide-qwik";
 import { TelemetryChart } from "~/components/analytics/TelemetryChart";
 import {
   fetchAnomalies,
   fetchForecast,
   fetchHistory,
   fetchTwins,
+  fetchDeviceAnalytics,
+  type DeviceAnalytics,
+  type Anomaly,
+  type HistoryItem,
+  type Forecast,
+  UsageTrend,
 } from "~/services/api";
 
 export const useAnalyticsTwins = routeLoader$(async () => {
@@ -20,28 +26,11 @@ export const useAnalyticsTwins = routeLoader$(async () => {
   }
 });
 
-interface HistoryItem {
-  last_synced: string;
-  temperature: number;
-  cpu_usage: number;
-}
-
-interface Forecast {
-  current_temperature: number;
-  forecast_temperature: number;
-  trend: string;
-}
-
-interface Anomaly {
-  timestamp: string;
-  type: string;
-  temperature: number;
-}
-
 interface AnalyticsData {
   history: HistoryItem[];
   forecast: Forecast | null;
   anomalies: Anomaly[];
+  deviceAnalytics: DeviceAnalytics | null;
   loading: boolean;
   selectedTwin: string | null;
 }
@@ -52,6 +41,7 @@ export default component$(() => {
     history: [],
     forecast: null,
     anomalies: [],
+    deviceAnalytics: null,
     loading: false,
     selectedTwin:
       twinsLoader.value.length > 0 ? twinsLoader.value[0].serial_number : null,
@@ -65,15 +55,17 @@ export default component$(() => {
 
     state.loading = true;
     try {
-      const [hist, forecast, anomalies] = await Promise.all([
+      const [hist, forecast, anomalies, deviceAnalytics] = await Promise.all([
         fetchHistory(state.selectedTwin),
         fetchForecast(state.selectedTwin),
         fetchAnomalies(state.selectedTwin),
+        fetchDeviceAnalytics(state.selectedTwin),
       ]);
 
       state.history = hist;
       state.forecast = forecast;
       state.anomalies = anomalies;
+      state.deviceAnalytics = deviceAnalytics;
     } catch (e) {
       console.error("Failed to fetch analytics", e);
     } finally {
@@ -148,6 +140,64 @@ export default component$(() => {
 
         {!state.loading && state.selectedTwin && (
           <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+            {/* Health & Trend Card */}
+            <div class="col-span-1 lg:col-span-2">
+               <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Health Score */}
+                  <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md">
+                      <div class="flex items-center gap-3 mb-2">
+                          <div class="p-2 rounded-full bg-emerald-500/20 text-emerald-400">
+                              <ActivityIcon class="w-6 h-6" />
+                          </div>
+                          <h3 class="text-lg font-medium text-slate-200">System Health</h3>
+                      </div>
+                      <div class="flex items-end gap-2">
+                          <span class="text-5xl font-bold text-white">{state.deviceAnalytics?.health_score ?? "--"}</span>
+                          <span class="text-lg text-slate-400 mb-1">/ 100</span>
+                      </div>
+                      <div class="mt-3 h-2 w-full rounded-full bg-white/5 overflow-hidden">
+                          <div class="h-full bg-gradient-to-r from-emerald-500 to-emerald-300 transition-all duration-1000" style={{ width: `${state.deviceAnalytics?.health_score ?? 0}%` }}></div>
+                      </div>
+                  </div>
+
+                  {/* Usage Trend */}
+                  <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md">
+                      <div class="flex items-center gap-3 mb-2">
+                          <div class="p-2 rounded-full bg-blue-500/20 text-blue-400">
+                              <TrendingUpIcon class="w-6 h-6" />
+                          </div>
+                          <h3 class="text-lg font-medium text-slate-200">Usage Trend</h3>
+                      </div>
+                      <div class="flex items-center gap-4 mt-2">
+                          {state.deviceAnalytics?.usage_trend === UsageTrend.INCREASING && (
+                              <TrendingUpIcon class="w-12 h-12 text-red-400" />
+                          )}
+                          {state.deviceAnalytics?.usage_trend === UsageTrend.DECREASING && (
+                              <TrendingDownIcon class="w-12 h-12 text-emerald-400" />
+                          )}
+                          {state.deviceAnalytics?.usage_trend === UsageTrend.STABLE && (
+                              <MinusIcon class="w-12 h-12 text-slate-400" />
+                          )}
+                          <div>
+                              <div class="text-2xl font-bold text-white capitalize">{state.deviceAnalytics?.usage_trend}</div>
+                              <div class="text-sm text-slate-400">Based on recent load</div>
+                          </div>
+                      </div>
+                  </div>
+
+                  {/* Last Analyzed */}
+                  <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md">
+                       <h3 class="text-lg font-medium text-slate-200 mb-2">Last Analysis</h3>
+                       <div class="text-3xl font-bold text-white">
+                           {state.deviceAnalytics?.last_analyzed ? new Date(state.deviceAnalytics.last_analyzed).toLocaleTimeString() : "--:--"}
+                       </div>
+                       <div class="text-sm text-slate-400 mt-1">
+                           {state.deviceAnalytics?.last_analyzed ? new Date(state.deviceAnalytics.last_analyzed).toLocaleDateString() : ""}
+                       </div>
+                  </div>
+               </div>
+            </div>
+
             <div class="space-y-4">
               <h2 class="flex items-center gap-2 text-xl font-semibold text-slate-200">
                 <span class="h-2 w-2 rounded-full bg-red-400 shadow-[0_0_10px_rgba(248,113,113,0.5)]"></span>

@@ -7,6 +7,7 @@ To maintain the high standard of the **Apple Digital Twin project**, all AI agen
 - **Clean Architecture**: Keep business logic (services) separate from transport layers (routes/WebSockets).
 - **SOLID Principles**: Especially Single Responsibility. Consumers should be pure observers; simulators should be pure providers.
 - **Persistent Connections**: Avoid "Connect-Per-Request" for RabbitMQ. Use the singleton pattern in `services/rabbitmq.py`.
+- **Worker Pattern**: Heavy background processing (like Analytics) should be offloaded to dedicated workers consuming from RabbitMQ queues.
 
 ## 🎨 Design & UX (Apple Aesthetics)
 

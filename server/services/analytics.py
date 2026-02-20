@@ -4,6 +4,21 @@ from sklearn.linear_model import LinearRegression
 from database import db
 
 
+
+async def get_device_analytics(serial_number: str):
+    """
+    Retrieve cached analytics overview.
+    """
+    analytics = await db.device_analytics.find_one({"serial_number": serial_number})
+    if not analytics:
+         return {
+             "health_score": 100,
+             "usage_trend": "stable",
+             "last_analyzed": None
+         }
+    return analytics
+
+
 async def get_telemetry_history(serial_number: str, limit: int = 100):
     """
     Retrieve historical telemetry data for a specific twin.

@@ -44,3 +44,15 @@ class ProductTwin(BaseModel):
 
     class Config:
         populate_by_name = True
+
+
+class DeviceAnalytics(BaseModel):
+    serial_number: str
+    last_analyzed: datetime = Field(default_factory=datetime.utcnow)
+    health_score: int = Field(..., ge=0, le=100, description="Overall device health score (0-100)")
+    predicted_failure_date: Optional[datetime] = None
+    anomalies: list[dict] = Field(default_factory=list)
+    usage_trend: str = Field(..., pattern="^(increasing|decreasing|stable)$")
+
+    class Config:
+        populate_by_name = True

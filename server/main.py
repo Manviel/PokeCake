@@ -9,6 +9,8 @@ from database import client
 from routes import analytics, twin_routes
 from services.rabbitmq import _connection, consume_telemetry
 from simulation.device_sim import run_simulation
+from services.analytics_worker import AnalyticsWorker
+from services.analytics_scheduler import analytics_scheduler_loop
 from sio_instance import sio
 
 api = FastAPI(
@@ -27,10 +29,21 @@ async def startup_event():
     print("⚡ PokeCake API with Socket.IO initialized ⚡")
     telemetry_task = asyncio.create_task(consume_telemetry(sio))
     simulation_task = asyncio.create_task(run_simulation())
+    
+    # Analytics Tasks
+    analytics_worker = AnalyticsWorker()
+    worker_task = asyncio.create_task(analytics_worker.run())
+    scheduler_task = asyncio.create_task(analytics_scheduler_loop())
+
     _background_tasks.add(telemetry_task)
     _background_tasks.add(simulation_task)
+    _background_tasks.add(worker_task)
+    _background_tasks.add(scheduler_task)
+
     telemetry_task.add_done_callback(_background_tasks.discard)
     simulation_task.add_done_callback(_background_tasks.discard)
+    worker_task.add_done_callback(_background_tasks.discard)
+    scheduler_task.add_done_callback(_background_tasks.discard)
 
 
 @api.on_event("shutdown")

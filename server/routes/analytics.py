@@ -4,6 +4,7 @@ from services.analytics import (
     detect_anomalies,
     get_telemetry_history,
     train_model_and_forecast,
+    get_device_analytics,
 )
 
 router = APIRouter()
@@ -28,6 +29,20 @@ async def get_history(serial_number: str):
     return history
 
 
+@router.get("/{serial_number}/overview")
+async def get_analytics_overview(serial_number: str):
+    """
+    Get cached analytics overview (Health, Trend, etc.).
+    """
+    analytics = await get_device_analytics(serial_number)
+    
+    # Convert _id to string if present
+    if "_id" in analytics:
+        analytics["_id"] = str(analytics["_id"])
+        
+    return analytics
+
+
 @router.get("/{serial_number}/forecast")
 async def get_forecast(serial_number: str):
     """
@@ -35,7 +50,8 @@ async def get_forecast(serial_number: str):
     """
     prediction = await train_model_and_forecast(serial_number)
     if "error" in prediction:
-        raise HTTPException(status_code=400, detail=prediction["error"])
+        # Instead of 400, return null/empty so UI handles gracefully
+        return None 
     return prediction
 
 
