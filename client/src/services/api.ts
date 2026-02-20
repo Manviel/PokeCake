@@ -1,7 +1,6 @@
 export interface ProductTwin {
   _id: string;
   name: string;
-  model_identifier: string;
   serial_number: string;
   os_version: string;
   battery_health: number;

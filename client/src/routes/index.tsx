@@ -203,7 +203,7 @@ export default component$(() => {
         </div>
       )}
 
-      <SpecsModal show={showSpecs} twin={selectedTwin.value} />
+      <SpecsModal show={showSpecs} twin={selectedTwin.value} onUpdate$={handleTwinUpdate} />
       <ManageModal
         show={showManage}
         twin={selectedTwin.value}

@@ -12,9 +12,6 @@ export const TwinCard = component$<TwinCardProps>(
   ({ twin, onManage$, onSpecs$ }) => {
     return (
       <article class="bg-apple-card border-apple-border glass rounded-[18px] border p-6 transition-transform duration-300 hover:scale-[1.02]">
-        <p class="text-apple-accent mb-2 text-xs font-semibold">
-          {twin.model_identifier}
-        </p>
         <h2 class="mb-4 text-2xl font-semibold">{twin.name}</h2>
 
         <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">

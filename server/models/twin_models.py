@@ -11,7 +11,6 @@ def generate_serial():
 
 class ProductTwinCreate(BaseModel):
     name: str = Field(default="iPhone 15 Pro")
-    model_identifier: str = Field(default="iPhone16,1")
     serial_number: str = Field(default_factory=generate_serial)
     os_version: str = Field(default="iOS 17.4")
     battery_health: int = Field(default=100, ge=0, le=100)
@@ -33,7 +32,6 @@ class ProductTwinUpdate(BaseModel):
 class ProductTwin(BaseModel):
     id: str = Field(..., alias="_id")
     name: str
-    model_identifier: str
     serial_number: str
     os_version: str
     battery_health: int
