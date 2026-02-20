@@ -84,12 +84,19 @@ docker-compose down
 graph TD
     UI[Qwik Frontend] <--> |WebSocket| SIO[Socket.IO Server]
     UI --> |REST API| API[FastAPI Backend]
-    API --> |Command| RMQ[RabbitMQ Exchange]
-    RMQ --> |Job| SIM[Device Simulator]
+    
+    API --> |Command| RMQ[RabbitMQ]
+    RMQ --> |Action| SIM[Device Simulator]
     SIM --> |Telemetry| RMQ
     RMQ --> |Update| CON[Telemetry Consumer]
+    
+    SCH[Analytics Scheduler] --> |Job| RMQ
+    RMQ --> |Job| WRK[Analytics Worker]
+    
     CON --> |Broadcast| SIO
     CON --> |Persist| DB[(MongoDB)]
+    WRK --> |Results| DB
+    API <--> |CRUD| DB
 ```
 
 ## 📁 Project Structure
@@ -108,8 +115,10 @@ PokeCake/
 
 ## ✨ Features
 
-- **Real-time Telemetry**: Live stream of CPU, Temperature, and Battery metrics.
-- **Hardware Command & Control**: Bi-directional communication via RabbitMQ.
-- **Diagnostic Bursts**: 10-second hardware stress-test with automatic cooldown logic.
-- **Premium Aesthetics**: Glassmorphic UI inspired by macOS.
-- **Hot Reloading**: Integrated developer experience for all components.
+- **Event-Driven Telemetry**: Live stream of CPU, Temperature, and Battery metrics, triggered only during active hardware windows.
+- **Hardware Command & Control**: Bi-directional communication via RabbitMQ for diagnostics and updates.
+- **Active Registry Simulation**: Highly efficient "Active Registry" pattern that only simulates hardware for devices with recent activity (Diagnostics/Updates).
+- **Multi-Sale Architecture**: Support for recording multiple sale records across different regions and segments for a single twin.
+- **Predictive Analytics**: Integrated ML models (Linear Regression) for temperature forecasting and anomaly detection.
+- **Premium Aesthetics**: Glassmorphic UI inspired by macOS with real-time fleet-wide sales aggregation.
+- **Hot Reloading**: Integrated developer experience for all components including RabbitMQ and MongoDB.
