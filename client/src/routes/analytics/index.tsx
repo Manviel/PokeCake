@@ -101,10 +101,14 @@ export default component$(() => {
   const da = state.deviceAnalytics;
 
   return (
-    <main class="min-h-screen bg-slate-950 p-8 pt-[80px] text-slate-50">
-      <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] bg-[size:14px_24px]"></div>
+    <main class="relative container mt-8 pt-[50px] min-h-screen text-slate-50">
+      {/* Solid dark background across full viewport */}
+      <div class="pointer-events-none fixed inset-0 -z-20 bg-slate-950"></div>
 
-      <div class="relative z-10 mx-auto max-w-7xl space-y-8">
+      {/* Background pattern */}
+      <div class="pointer-events-none fixed inset-0 -z-10 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] bg-[size:14px_24px]"></div>
+
+      <div class="relative z-10 space-y-8">
         <SalesSummaryCard summary={salesSummaryLoader.value} />
 
         {/* Header + device selector */}

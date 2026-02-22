@@ -9,6 +9,8 @@ import {
   CalendarIcon,
 } from "lucide-qwik";
 import { type DeviceAnalytics, UsageTrend } from "~/services/api";
+import { AnalyticsCard } from "./AnalyticsCard";
+import { AnalyticsStat } from "./AnalyticsStat";
 
 interface KpiGridProps {
   da: DeviceAnalytics | null;
@@ -18,35 +20,27 @@ export const KpiGrid = component$<KpiGridProps>(({ da }) => {
   return (
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-5">
       {/* Health Score */}
-      <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md">
-        <div class="mb-2 flex items-center gap-3">
-          <div class="rounded-full bg-emerald-500/20 p-2 text-emerald-400">
-            <ActivityIcon class="h-6 w-6" />
-          </div>
-          <h3 class="text-lg font-medium text-slate-200">System Health</h3>
-        </div>
-        <div class="flex items-end gap-2">
-          <span class="text-5xl font-bold text-white">
-            {da?.health_score ?? "--"}
+      <AnalyticsCard title="System Health" iconColor="emerald">
+        <ActivityIcon q:slot="icon" class="h-6 w-6" />
+        <AnalyticsStat
+          value={da?.health_score ?? "--"}
+          valueClass="text-5xl font-bold text-white"
+        >
+          <span q:slot="suffix" class="mb-1 text-lg text-slate-400">
+            / 100
           </span>
-          <span class="mb-1 text-lg text-slate-400">/ 100</span>
-        </div>
-        <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/5">
-          <div
-            class="h-full bg-gradient-to-r from-emerald-500 to-emerald-300 transition-all duration-1000"
-            style={{ width: `${da?.health_score ?? 0}%` }}
-          ></div>
-        </div>
-      </div>
+          <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/5">
+            <div
+              class="h-full bg-gradient-to-r from-emerald-500 to-emerald-300 transition-all duration-1000"
+              style={{ width: `${da?.health_score ?? 0}%` }}
+            ></div>
+          </div>
+        </AnalyticsStat>
+      </AnalyticsCard>
 
       {/* Usage Trend */}
-      <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md">
-        <div class="mb-2 flex items-center gap-3">
-          <div class="rounded-full bg-blue-500/20 p-2 text-blue-400">
-            <TrendingUpIcon class="h-6 w-6" />
-          </div>
-          <h3 class="text-lg font-medium text-slate-200">Usage Trend</h3>
-        </div>
+      <AnalyticsCard title="Usage Trend" iconColor="blue">
+        <TrendingUpIcon q:slot="icon" class="h-6 w-6" />
         <div class="mt-2 flex items-center gap-4">
           {da?.usage_trend === UsageTrend.INCREASING && (
             <TrendingUpIcon class="h-12 w-12 text-red-400" />
@@ -70,70 +64,58 @@ export const KpiGrid = component$<KpiGridProps>(({ da }) => {
             Return Risk Active
           </div>
         )}
-      </div>
+      </AnalyticsCard>
 
       {/* Revenue at Risk */}
-      <div class="rounded-3xl border border-red-500/20 bg-gradient-to-br from-slate-900 to-red-950/20 p-6 shadow-lg backdrop-blur-md">
-        <div class="mb-2 flex items-center gap-3">
-          <div class="rounded-full bg-red-500/20 p-2 text-red-400">
-            <DollarSignIcon class="h-6 w-6" />
-          </div>
-          <h3 class="text-lg font-medium text-slate-200">Revenue at Risk</h3>
-        </div>
+      <AnalyticsCard title="Revenue at Risk" variant="danger" iconColor="red">
+        <DollarSignIcon q:slot="icon" class="h-6 w-6" />
         {da?.revenue_at_risk != null ? (
-          <>
-            <div class="text-4xl font-bold text-red-300">
-              $
-              {da.revenue_at_risk.toLocaleString("en-US", {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0,
-              })}
-            </div>
-            <div class="mt-1 text-xs text-slate-500">based on health score</div>
-          </>
+          <AnalyticsStat
+            value={`$${da.revenue_at_risk.toLocaleString("en-US", {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0,
+            })}`}
+            valueClass="text-4xl font-bold text-red-300"
+            subtext="based on health score"
+          />
         ) : (
           <div class="mt-4 text-sm text-slate-600">No sale record</div>
         )}
-      </div>
+      </AnalyticsCard>
 
       {/* Days Since Sale */}
-      <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md">
-        <div class="mb-2 flex items-center gap-3">
-          <div class="rounded-full bg-purple-500/20 p-2 text-purple-400">
-            <CalendarIcon class="h-6 w-6" />
-          </div>
-          <h3 class="text-lg font-medium text-slate-200">Days Since Sale</h3>
-        </div>
+      <AnalyticsCard title="Days Since Sale" iconColor="purple">
+        <CalendarIcon q:slot="icon" class="h-6 w-6" />
         {da?.days_since_sale != null ? (
-          <>
-            <div class="text-4xl font-bold text-white">
-              {da.days_since_sale}
-            </div>
-            <div class="mt-1 text-xs text-slate-500">
-              {da.days_since_sale < 365
+          <AnalyticsStat
+            value={da.days_since_sale}
+            subtext={
+              da.days_since_sale < 365
                 ? `${365 - da.days_since_sale}d left in warranty`
-                : "Warranty expired"}
-            </div>
-          </>
+                : "Warranty expired"
+            }
+          />
         ) : (
           <div class="mt-4 text-sm text-slate-600">No sale record</div>
         )}
-      </div>
+      </AnalyticsCard>
 
       {/* Last Analyzed */}
-      <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md">
-        <h3 class="mb-2 text-lg font-medium text-slate-200">Last Analysis</h3>
-        <div class="text-3xl font-bold text-white">
-          {da?.last_analyzed
-            ? new Date(da.last_analyzed).toLocaleTimeString()
-            : "--:--"}
-        </div>
-        <div class="mt-1 text-sm text-slate-400">
-          {da?.last_analyzed
-            ? new Date(da.last_analyzed).toLocaleDateString()
-            : ""}
-        </div>
-      </div>
+      <AnalyticsCard title="Last Analysis">
+        <AnalyticsStat
+          value={
+            da?.last_analyzed
+              ? new Date(da.last_analyzed).toLocaleTimeString()
+              : "--:--"
+          }
+          valueClass="text-3xl font-bold text-white"
+          subtext={
+            da?.last_analyzed
+              ? new Date(da.last_analyzed).toLocaleDateString()
+              : ""
+          }
+        />
+      </AnalyticsCard>
     </div>
   );
 });

@@ -23,7 +23,7 @@ export const RevenueBreakdown = component$<RevenueBreakdownProps>(
 
     return (
       <div>
-        <h3 class="mb-3 text-xs font-medium tracking-wider text-slate-500 uppercase">
+        <h3 class="mb-3 text-sm font-medium tracking-wider text-slate-500 uppercase">
           {title}
         </h3>
         <div class="space-y-2">
