@@ -1,8 +1,4 @@
-import {
-  $,
-  component$,
-  useSignal,
-} from "@builder.io/qwik";
+import { $, component$, useSignal } from "@builder.io/qwik";
 import { type DocumentHead, routeLoader$ } from "@builder.io/qwik-city";
 import { useTwinSocket } from "../hooks/useTwinSocket";
 import { AddDeviceCard } from "../components/twin/AddDeviceCard";
@@ -147,13 +143,20 @@ export default component$(() => {
                 />
               ))}
 
-              <AddDeviceCard isPairing={isPairing} onClick$={handlePairDevice} />
+              <AddDeviceCard
+                isPairing={isPairing}
+                onClick$={handlePairDevice}
+              />
             </>
           )}
         </div>
       )}
 
-      <SpecsModal show={showSpecs} twin={selectedTwin.value} onUpdate$={handleTwinUpdate} />
+      <SpecsModal
+        show={showSpecs}
+        twin={selectedTwin.value}
+        onUpdate$={handleTwinUpdate}
+      />
       <ManageModal
         show={showManage}
         twin={selectedTwin.value}

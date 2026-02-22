@@ -18,7 +18,10 @@ export const SaleDetailView = component$<SaleDetailViewProps>(
             <CheckCircleIcon class="h-4 w-4 shrink-0" />
             <div class="min-w-0">
               <p class="text-xl font-bold text-gray-900 leading-tight">
-                ${sale.price_usd.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                $
+                {sale.price_usd.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                })}
               </p>
               <p class="text-xs text-gray-500 truncate">
                 {new Date(sale.sold_at).toLocaleDateString(undefined, {

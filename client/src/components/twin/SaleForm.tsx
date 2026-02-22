@@ -1,9 +1,4 @@
-import {
-  $,
-  component$,
-  type QRL,
-  type ReadonlySignal,
-} from "@builder.io/qwik";
+import { $, component$, type QRL, type ReadonlySignal } from "@builder.io/qwik";
 import { Loader2Icon } from "lucide-qwik";
 import type { SaleRecord } from "../../services/api";
 import { Button } from "../ui/button/button";

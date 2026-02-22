@@ -105,7 +105,9 @@ export const fetchHistory = async (serial: string): Promise<HistoryItem[]> => {
   return response.json();
 };
 
-export const fetchForecast = async (serial: string): Promise<Forecast | null> => {
+export const fetchForecast = async (
+  serial: string,
+): Promise<Forecast | null> => {
   const response = await fetch(`${API_BASE}/analytics/${serial}/forecast`);
   if (!response.ok) return null;
   return response.json();
@@ -201,7 +203,6 @@ export const fetchSaleRecords = async (
   if (!response.ok) return [];
   return response.json();
 };
-
 
 export const fetchSalesSummary = async (): Promise<SalesSummary> => {
   const response = await fetch(`${API_BASE}/sales/summary`);

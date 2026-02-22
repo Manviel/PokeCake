@@ -164,7 +164,7 @@ export default component$(() => {
             </div>
           )}
         </header>
-        
+
         {state.loading && !state.history.length && state.selectedTwin && (
           <div class="flex animate-pulse justify-center space-x-4 p-12">
             <div class="text-xl text-slate-500">Initializing AI Models...</div>
