@@ -21,8 +21,14 @@ export const SalesSummaryCard = component$<SalesSummaryCardProps>(
         : 0;
 
     return (
-      <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md">
-        <h2 class="mb-6 flex items-center gap-2 text-xl font-semibold text-slate-200">
+      <section
+        aria-labelledby="sales-overview-heading"
+        class="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md"
+      >
+        <h2
+          id="sales-overview-heading"
+          class="mb-6 flex items-center gap-2 text-xl font-semibold text-slate-200"
+        >
           Sales Overview
         </h2>
 
@@ -98,7 +104,7 @@ export const SalesSummaryCard = component$<SalesSummaryCardProps>(
             to record your first sale.
           </div>
         )}
-      </div>
+      </section>
     );
   },
 );

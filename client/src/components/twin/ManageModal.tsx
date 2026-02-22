@@ -69,6 +69,7 @@ export const ManageModal = component$<ManageModalProps>((props) => {
                 </div>
                 <button
                   type="button"
+                  aria-label="Close modal"
                   onClick$={() => (props.show.value = false)}
                   class="flex h-8 w-8 items-center justify-center rounded-full bg-black/5 transition-colors hover:bg-black/10"
                 >

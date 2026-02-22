@@ -168,11 +168,11 @@ export default component$(() => {
 });
 
 export const head: DocumentHead = {
-  title: "Apple Digital Twin - Dashboard",
+  title: "Dashboard - Apple Digital Twin",
   meta: [
     {
       name: "description",
-      content: "Manage your Apple hardware digital twins.",
+      content: "Manage your hardware digital twins.",
     },
   ],
 };

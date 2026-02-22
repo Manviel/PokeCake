@@ -11,19 +11,19 @@ interface SaleDetailViewProps {
 export const SaleDetailView = component$<SaleDetailViewProps>(
   ({ sale, onEdit$, onDelete$ }) => {
     return (
-      <div class="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4">
+      <article class="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4">
         <div class="flex items-start justify-between gap-3">
           {/* Left: price + date */}
-          <div class="flex items-center gap-2 text-emerald-700 min-w-0">
+          <div class="flex items-center gap-2 min-w-0 text-emerald-700">
             <CheckCircleIcon class="h-4 w-4 shrink-0" />
             <div class="min-w-0">
-              <p class="text-xl font-bold text-gray-900 leading-tight">
+              <p class="leading-tight text-xl font-bold text-gray-900">
                 $
                 {sale.price_usd.toLocaleString("en-US", {
                   minimumFractionDigits: 2,
                 })}
               </p>
-              <p class="text-xs text-gray-500 truncate">
+              <p class="truncate text-xs text-gray-500">
                 {new Date(sale.sold_at).toLocaleDateString(undefined, {
                   year: "numeric",
                   month: "short",
@@ -34,14 +34,14 @@ export const SaleDetailView = component$<SaleDetailViewProps>(
           </div>
 
           {/* Centre: badges */}
-          <div class="flex flex-wrap gap-1.5 flex-1 justify-center">
+          <div class="flex flex-1 flex-wrap justify-center gap-1.5">
             <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
               {sale.region}
             </span>
-            <span class="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 capitalize">
+            <span class="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium capitalize text-blue-800">
               {sale.channel}
             </span>
-            <span class="rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-medium text-violet-800 capitalize">
+            <span class="rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-medium capitalize text-violet-800">
               {sale.customer_segment}
             </span>
           </div>
@@ -50,6 +50,7 @@ export const SaleDetailView = component$<SaleDetailViewProps>(
           <div class="flex shrink-0 gap-1">
             <button
               type="button"
+              aria-label="Edit sale"
               onClick$={onEdit$}
               title="Edit sale"
               class="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-black/5 hover:text-gray-700"
@@ -58,6 +59,7 @@ export const SaleDetailView = component$<SaleDetailViewProps>(
             </button>
             <button
               type="button"
+              aria-label="Delete sale"
               onClick$={onDelete$}
               title="Delete sale"
               class="flex h-7 w-7 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
@@ -66,7 +68,7 @@ export const SaleDetailView = component$<SaleDetailViewProps>(
             </button>
           </div>
         </div>
-      </div>
+      </article>
     );
   },
 );

@@ -1,5 +1,5 @@
 import { component$, useStore, useTask$ } from "@builder.io/qwik";
-import { routeLoader$ } from "@builder.io/qwik-city";
+import { type DocumentHead, routeLoader$ } from "@builder.io/qwik-city";
 import { Listbox } from "~/components/ui/listbox/listbox";
 import { KpiGrid } from "~/components/analytics/KpiGrid";
 import { ForecastPanel } from "~/components/analytics/ForecastPanel";
@@ -185,3 +185,13 @@ export default component$(() => {
     </main>
   );
 });
+
+export const head: DocumentHead = {
+  title: "Analytics - Apple Digital Twin",
+  meta: [
+    {
+      name: "description",
+      content: "Analytics data for your hardware digital twins.",
+    },
+  ],
+};

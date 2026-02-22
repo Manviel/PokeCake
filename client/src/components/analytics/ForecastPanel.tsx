@@ -8,9 +8,14 @@ interface ForecastPanelProps {
 export const ForecastPanel = component$<ForecastPanelProps>(({ forecast }) => {
   if (!forecast) return null;
   return (
-    <div class="group mt-4 rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md transition-all duration-500 hover:border-white/20">
+    <section
+      aria-labelledby="forecast-heading"
+      class="group mt-4 rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md transition-all duration-500 hover:border-white/20"
+    >
       <div class="flex items-start justify-between">
-        <h3 class="text-xl font-medium text-slate-200">AI Prediction Model</h3>
+        <h3 id="forecast-heading" class="text-xl font-medium text-slate-200">
+          AI Prediction Model
+        </h3>
         <div class="rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-300">
           Linear Regression
         </div>
@@ -38,6 +43,6 @@ export const ForecastPanel = component$<ForecastPanelProps>(({ forecast }) => {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 });

@@ -7,8 +7,14 @@ interface AnomalyLogProps {
 
 export const AnomalyLog = component$<AnomalyLogProps>(({ anomalies }) => {
   return (
-    <div class="mt-4 min-h-[200px] rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md">
-      <h3 class="mb-4 text-xl font-medium text-slate-200">
+    <section
+      aria-labelledby="anomaly-log-heading"
+      class="mt-4 min-h-[200px] rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-900/50 p-6 shadow-lg backdrop-blur-md"
+    >
+      <h3
+        id="anomaly-log-heading"
+        class="mb-4 text-xl font-medium text-slate-200"
+      >
         Anomaly Detection Log
       </h3>
       <div class="custom-scrollbar h-32 overflow-y-auto pr-2">
@@ -40,6 +46,6 @@ export const AnomalyLog = component$<AnomalyLogProps>(({ anomalies }) => {
           </ul>
         )}
       </div>
-    </div>
+    </section>
   );
 });

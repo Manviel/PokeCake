@@ -44,6 +44,7 @@ export const SpecsModal = component$<SpecsModalProps>(
                 </div>
                 <button
                   type="button"
+                  aria-label="Close modal"
                   onClick$={() => (show.value = false)}
                   class="flex h-8 w-8 items-center justify-center rounded-full bg-black/5 transition-colors hover:bg-black/10"
                 >
@@ -75,7 +76,11 @@ export const SpecsModal = component$<SpecsModalProps>(
                   onSubmit$={handleSubmit}
                   class="flex gap-3"
                 >
+                  <label for="device-name" class="sr-only">
+                    Device name
+                  </label>
                   <input
+                    id="device-name"
                     type="text"
                     value={nameValue.value}
                     onInput$={(e) =>
