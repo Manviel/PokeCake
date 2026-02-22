@@ -1,7 +1,6 @@
 import { component$, useStore, useTask$ } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
-import { Select } from "@qwik-ui/headless";
-import { CheckIcon, ChevronDownIcon } from "lucide-qwik";
+import { Listbox } from "~/components/ui/listbox/listbox";
 import { KpiGrid } from "~/components/analytics/KpiGrid";
 import { ForecastPanel } from "~/components/analytics/ForecastPanel";
 import { AnomalyLog } from "~/components/analytics/AnomalyLog";
@@ -116,38 +115,19 @@ export default component$(() => {
             </h1>
             <div class="mt-4 flex items-center gap-4">
               <p class="text-slate-400">Analysis for:</p>
-              <Select.Root
+              <Listbox
                 value={state.selectedTwin || undefined}
                 onChange$={(val: string) => {
                   state.selectedTwin = val;
                 }}
-              >
-                <Select.Trigger class="flex min-w-[200px] items-center justify-between gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white transition-colors hover:bg-white/10">
-                  <Select.DisplayValue placeholder="Select a Twin" />
-                  <ChevronDownIcon class="h-4 w-4 opacity-50" />
-                </Select.Trigger>
-                <Select.Popover class="z-50 min-w-[200px] rounded-xl border border-white/10 bg-slate-900/95 p-1 shadow-2xl backdrop-blur-xl">
-                  <Select.Listbox class="max-h-[300px] overflow-auto">
-                    {twinsLoader.value.map((twin) => (
-                      <Select.Item
-                        key={twin.serial_number}
-                        value={twin.serial_number}
-                        class="flex cursor-pointer items-center justify-between rounded-lg px-4 py-2 text-slate-300 transition-colors outline-none hover:bg-white/10 hover:text-white data-[highlighted]:bg-white/10 data-[highlighted]:text-white"
-                      >
-                        <div class="flex items-center gap-2">
-                          <Select.ItemLabel>{twin.name}</Select.ItemLabel>
-                          <span class="text-xs text-slate-500">
-                            ({twin.serial_number})
-                          </span>
-                        </div>
-                        <Select.ItemIndicator>
-                          <CheckIcon class="h-4 w-4 text-blue-400" />
-                        </Select.ItemIndicator>
-                      </Select.Item>
-                    ))}
-                  </Select.Listbox>
-                </Select.Popover>
-              </Select.Root>
+                options={twinsLoader.value.map((twin) => ({
+                  label: twin.name,
+                  value: twin.serial_number,
+                  description: `(${twin.serial_number})`,
+                }))}
+                placeholder="Select a Twin"
+                triggerClass="flex min-w-[200px] items-center justify-between gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white transition-colors hover:bg-white/10"
+              />
             </div>
           </div>
           {state.loading && (

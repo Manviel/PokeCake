@@ -1,5 +1,6 @@
-import { $, component$, type QRL, type ReadonlySignal } from "@builder.io/qwik";
+import { component$, type QRL, type ReadonlySignal } from "@builder.io/qwik";
 import { Loader2Icon } from "lucide-qwik";
+import { Listbox } from "../ui/listbox/listbox";
 import type { SaleRecord } from "../../services/api";
 import { Button } from "../ui/button/button";
 
@@ -18,22 +19,35 @@ interface SaleFormProps {
   onSubmit$: QRL<() => void>;
 }
 
-const selectClass =
+const inputClass =
   "w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm text-apple-text focus:border-apple-accent focus:ring-1 focus:ring-apple-accent focus:outline-none transition-colors";
 const labelClass =
   "mb-1 block text-xs font-medium text-gray-500 uppercase tracking-wide";
 
+const REGION_OPTIONS: { label: string; value: SaleRecord["region"] }[] = [
+  { label: "US", value: "US" },
+  { label: "EU", value: "EU" },
+  { label: "APAC", value: "APAC" },
+  { label: "LATAM", value: "LATAM" },
+];
+
+const CHANNEL_OPTIONS: { label: string; value: SaleRecord["channel"] }[] = [
+  { label: "Online", value: "online" },
+  { label: "Retail", value: "retail" },
+  { label: "B2B", value: "B2B" },
+];
+
+const SEGMENT_OPTIONS: {
+  label: string;
+  value: SaleRecord["customer_segment"];
+}[] = [
+  { label: "Consumer", value: "consumer" },
+  { label: "Enterprise", value: "enterprise" },
+  { label: "Education", value: "education" },
+];
+
 export const SaleForm = component$<SaleFormProps>(
   ({ form, isSubmitting, isEditing = false, onCancel$, onSubmit$ }) => {
-    const handleSelectChange = $((e: Event, key: keyof SaleFormStore) => {
-      const target = e.target as HTMLSelectElement;
-      const val = target.value;
-      if (key === "region") form.region = val as SaleRecord["region"];
-      else if (key === "channel") form.channel = val as SaleRecord["channel"];
-      else if (key === "customer_segment")
-        form.customer_segment = val as SaleRecord["customer_segment"];
-    });
-
     return (
       <div class="space-y-4">
         <div class="grid grid-cols-2 gap-4">
@@ -51,7 +65,7 @@ export const SaleForm = component$<SaleFormProps>(
               onInput$={(e) => {
                 form.price_usd = (e.target as HTMLInputElement).value;
               }}
-              class={selectClass}
+              class={inputClass}
             />
           </div>
 
@@ -59,49 +73,45 @@ export const SaleForm = component$<SaleFormProps>(
             <label for="sale-region" class={labelClass}>
               Region
             </label>
-            <select
+            <Listbox
               id="sale-region"
               value={form.region}
-              onChange$={(e) => handleSelectChange(e, "region")}
-              class={selectClass}
-            >
-              <option value="US">US</option>
-              <option value="EU">EU</option>
-              <option value="APAC">APAC</option>
-              <option value="LATAM">LATAM</option>
-            </select>
+              onChange$={(val: string) => {
+                form.region = val as SaleRecord["region"];
+              }}
+              options={REGION_OPTIONS}
+              placeholder="Select Region"
+            />
           </div>
 
           <div>
             <label for="sale-channel" class={labelClass}>
               Channel
             </label>
-            <select
+            <Listbox
               id="sale-channel"
               value={form.channel}
-              onChange$={(e) => handleSelectChange(e, "channel")}
-              class={selectClass}
-            >
-              <option value="online">Online</option>
-              <option value="retail">Retail</option>
-              <option value="B2B">B2B</option>
-            </select>
+              onChange$={(val: string) => {
+                form.channel = val as SaleRecord["channel"];
+              }}
+              options={CHANNEL_OPTIONS}
+              placeholder="Select Channel"
+            />
           </div>
 
           <div class="col-span-2">
             <label for="sale-segment" class={labelClass}>
               Customer Segment
             </label>
-            <select
+            <Listbox
               id="sale-segment"
               value={form.customer_segment}
-              onChange$={(e) => handleSelectChange(e, "customer_segment")}
-              class={selectClass}
-            >
-              <option value="consumer">Consumer</option>
-              <option value="enterprise">Enterprise</option>
-              <option value="education">Education</option>
-            </select>
+              onChange$={(val: string) => {
+                form.customer_segment = val as SaleRecord["customer_segment"];
+              }}
+              options={SEGMENT_OPTIONS}
+              placeholder="Select Segment"
+            />
           </div>
         </div>
 
