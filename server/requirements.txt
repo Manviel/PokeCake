@@ -12,3 +12,8 @@ ruff
 pandas
 scikit-learn
 numpy
+mcp
+google-genai
+tenacity
+pytest
+pytest-asyncio
