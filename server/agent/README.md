@@ -11,7 +11,14 @@ cd server
 python -m pytest agent/evals/test_agent.py
 ```
 
-### Running the Analytics Orchestrator
+### Running the Orchestrator Manager Agent
+The Manager Agent orchestrates multiple tools via Gemini function calling to solve complex workflows.
+```bash
+cd server
+python -m agent.manager_agent
+```
+
+### Running the Analytics Agent
 To execute a live prompt against the Gemini API that fetches data from the MongoDB:
 1. Ensure `GEMINI_API_KEY` is present in your root `.env` file.
 2. Start the MongoDB via docker-compose (`docker-compose up -d mongodb`).
@@ -39,11 +46,17 @@ We use `pydantic` in `llm_client.py` alongside Google Gemini's `response_schema`
 
 ## 4. Prompt Engineering & Workflow Optimization
 `prompts.py` isolates our system and user prompts. It demonstrates context injection and constraints (e.g., highlighting specific temperature thresholds).
-`analytics_agent.py` orchestrates a defined workflow: 
-1. Call MCP Tools 
-2. Assemble Prompts 
-3. Call LLM 
-4. Parse Output.
+We demonstrate two distinct workflows:
+**A) Single-pass (analytics_agent.py)**: 
+1. Call MCP Tools linearly.
+2. Assemble Prompts.
+3. Call LLM for an expected JSON block.
+
+**B) Multi-pass ReAct Orchestrator (manager_agent.py)**:
+1. LLM receives a high-level goal.
+2. Dynamically decides to call `call_analytics_agent`.
+3. Synthesizes the response, then loops to call `save_report_to_db` and `generate_pdf_report`.
+4. Decides it has finished and replies.
 
 ## 5. Evaluation Frameworks
 The `evals/test_agent.py` suite uses `pytest` to evaluate the system. It uses mocked clients to test the workflow without incurring latency/cost, validating that the guardrails and data structures behave as expected.

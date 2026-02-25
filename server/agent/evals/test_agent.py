@@ -3,9 +3,11 @@ import unittest.mock
 from unittest.mock import patch
 
 import pytest
+from google.genai.types import Candidate, Content, FunctionCall, Part
 
 from agent.analytics_agent import AnalyticsReport, run_analytics_agent
 from agent.llm_client import LLMClient, LLMGuardrailException
+from agent.manager_agent import run_manager_agent
 
 
 @pytest.mark.asyncio
@@ -76,3 +78,41 @@ def test_eval_costs_vs_latency():
     In a real scenario, this tracks token counts and response times.
     """
     assert True, "Cost and Latency tracking hooks verified."
+
+
+@pytest.mark.asyncio
+@patch("agent.manager_agent.LLMClient.generate_with_tools")
+@patch.dict("os.environ", {"GEMINI_API_KEY": "mock-key"})
+async def test_manager_routing_logic(mock_generate):
+    """
+    Test that the manager correctly loops and handles tool calls.
+    We mock the LLM to return a tool call for analytics, then return a final answer.
+    """
+    # First response: call tools
+    call_mcp = FunctionCall(name="call_analytics_agent", args={"region": "US"})
+
+    mock_resp_1 = unittest.mock.MagicMock()
+    mock_resp_1.function_calls = [call_mcp]
+    mock_resp_1.candidates = [
+        Candidate(content=Content(parts=[Part(function_call=call_mcp)]))
+    ]
+
+    # Second response: final answer
+    mock_resp_2 = unittest.mock.MagicMock()
+    mock_resp_2.function_calls = None
+    mock_resp_2.text = "Finished parsing."
+    mock_resp_2.candidates = [
+        Candidate(content=Content(parts=[Part(text="Finished parsing.")]))
+    ]
+
+    mock_generate.side_effect = [mock_resp_1, mock_resp_2]
+
+    # We mock the actual tool execution so it doesn't hit DB/Analytics
+    with patch("agent.manager_agent.call_analytics_agent") as mock_analytics:
+        mock_analytics.return_value = {"summary": "Mocked", "anomalies_detected": []}
+
+        result = await run_manager_agent("Analyze US computers")
+
+        # Verify routing logic works securely
+        mock_analytics.assert_called_once_with(region="US")
+        assert result == "Finished parsing."

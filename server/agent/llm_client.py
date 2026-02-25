@@ -82,3 +82,35 @@ class LLMClient:
         except Exception as e:
             # Re-raise standard exceptions for tenacity
             raise e
+
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=10),
+        retry=retry_if_exception_type((Exception)),
+        reraise=True,
+    )
+    async def generate_with_tools(
+        self,
+        system_prompt: str,
+        contents: list | str,
+        tools: list,
+        temperature: float = 0.2,
+    ) -> genai.types.GenerateContentResponse:
+        """
+        Generates a response using the Gemini Function Calling API.
+        Takes a list of tools (functions) that the model can request to execute.
+        Returns the raw response so the Orchestrator can handle the tool execution loop.
+        """
+        try:
+            response = self.client.models.generate_content(
+                model="gemini-3-flash-preview",
+                contents=contents,
+                config=genai.types.GenerateContentConfig(
+                    system_instruction=system_prompt,
+                    temperature=temperature,
+                    tools=tools,
+                ),
+            )
+            return response
+        except Exception as e:
+            raise e
